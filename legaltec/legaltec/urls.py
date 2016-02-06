@@ -17,6 +17,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 from area import views as areaviews
+from doc import views as docviews
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
@@ -27,7 +28,10 @@ urlpatterns = [
     url(r'^area/(?P<areacode>[0-9]+)/establishments/$', areaviews.ListEstablishmentView.as_view()),
     url(r'^area/(?P<areacode>[0-9]+)/establishment/$', areaviews.handle_establishment),
     url(r'^area/(?P<areacode>[0-9]+)/establishment/(?P<establishmentid>[0-9]+)/$', areaviews.edit_establishment),
-    url(r'^areastatus/', areaviews.ListAreaStatusView.as_view()),
+    url(r'^areastatuss/', areaviews.ListAreaStatusView.as_view()),
     url(r'^areastatus/$', areaviews.handle_areastatus),
-    url(r'^areastatus/(?P<areacode>[0-9]+)/$', areaviews.edit_areastatus),
+    url(r'^areastatus/(?P<areastatuscode>[0-9]+)/$', areaviews.edit_areastatus),
+    url(r'^documentstatuss/', docviews.ListDocumentStatusView.as_view()),
+    url(r'^documentstatus/$', docviews.handle_documentstatus),
+    url(r'^documentstatus/(?P<docstatuscode>[0-9]+)/$', docviews.edit_documentstatus),
 ]

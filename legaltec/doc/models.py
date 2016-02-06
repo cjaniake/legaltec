@@ -24,3 +24,10 @@ class DocumentTypeField(models.Model):
     class Meta:
         unique_together = ("documentType", "name")
 
+class DocumentStatus(models.Model):
+    name = models.CharField("Status", max_length=50, unique=True)
+    enabled = models.BooleanField("Ativo")
+    minimumValidity = models.IntegerField("Validade mínima", null=True, blank=True)
+    colorCode = models.CharField("Color", max_length=7, default="#FFFFFF")
+    def __unicode__(self):
+        return u'%s' % (self.name)

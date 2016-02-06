@@ -6,7 +6,7 @@ from area.models import Area, Establishment, AreaStatus
 class AreaStatusForm(ModelForm):
     class Meta:
         model = AreaStatus
-        fields = ['name','enabled']
+        fields = ['name','minimumValidity','enabled','colorCode']
 
 class AreaForm(ModelForm):
     class Meta:
@@ -17,4 +17,3 @@ class EstablishmentForm(ModelForm):
     class Meta:
         model = Establishment
         fields = ['name','city','state','adminEmail']
-
