@@ -13,6 +13,8 @@ class Area(models.Model):
     name = models.CharField("Área", max_length=50, unique=True)
     areaStatus = models.ForeignKey(AreaStatus, verbose_name="Status")
     adminEmail = models.EmailField("Email administrador")
+    def __unicode__(self):
+        return u'%s' % (self.name)
 
 class Establishment(models.Model):
     area = models.ForeignKey(Area, verbose_name="Área")
@@ -22,3 +24,5 @@ class Establishment(models.Model):
     adminEmail = models.EmailField("Email administrador")
     class Meta:
         unique_together = ("area", "name")
+    def __unicode__(self):
+        return u'%s' % (self.name)
