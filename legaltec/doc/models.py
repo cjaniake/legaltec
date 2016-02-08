@@ -4,6 +4,10 @@ from django.db import models
 class DocumentType(models.Model):
     name = models.CharField("Tipo de documento", max_length=50, unique=True)
     validityPeriod = models.IntegerField("Validade em meses")
+    Description = models.CharField("Descrição", max_length=50, null=True, blank=True)
+    Group = models.CharField("Grupo", max_length=50, null=True, blank=True)
+    City = models.CharField("Cidade", max_length=50, null=True, blank=True)
+    State = models.CharField("Estado", max_length=50, null=True, blank=True)
     def __unicode__(self):
         return u'%s' % (self.name)
 
