@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+from area.models import Establishment
+
+from django.contrib.auth.models import User
+
 class DocumentType(models.Model):
     name = models.CharField("Tipo de documento", max_length=50, unique=True)
     validityPeriod = models.IntegerField("Validade em meses")
-    Description = models.CharField("Descrição", max_length=50, null=True, blank=True)
-    Group = models.CharField("Grupo", max_length=50, null=True, blank=True)
-    City = models.CharField("Cidade", max_length=50, null=True, blank=True)
-    State = models.CharField("Estado", max_length=50, null=True, blank=True)
+    description = models.CharField("Descrição", max_length=50, null=True, blank=True)
+    group = models.CharField("Grupo", max_length=50, null=True, blank=True)
+    city = models.CharField("Cidade", max_length=50, null=True, blank=True)
+    state = models.CharField("Estado", max_length=50, null=True, blank=True)
     def __unicode__(self):
         return u'%s' % (self.name)
 
@@ -35,3 +39,27 @@ class DocumentStatus(models.Model):
     colorCode = models.CharField("Color", max_length=7, default="#FFFFFF")
     def __unicode__(self):
         return u'%s' % (self.name)
+
+class Document(models.Model):
+    establishment = models.ForeignKey(Establishment, verbose_name="Estabelecimento")
+    documentType = models.ForeignKey(DocumentType, verbose_name="Tipo de documento")
+    documentStatus = models.ForeignKey(DocumentStatus, verbose_name="Status do documento")
+    expeditionDate = models.DateField("Data de Emissão")
+    expirationDate = models.DateField("Data de Expiração")
+    def __unicode__(self):
+        return u'%s %s-%s' % (self.documentType.name, self.expeditionDate, self.expirationDate)
+
+class DocumentHistory(models.Model):
+    document = models.ForeignKey(Document, verbose_name="Documento")
+    user = models.OneToOneField(User, on_delete=models.PROTECT, null=True, blank=True)
+    referenceDate = models.DateTimeField
+    operation = models.CharField("Operação", max_length=50)
+    snapshot = models.CharField("Resumo dos dados", max_length=1000)
+
+class DocumentImage(models.Model):
+    document = models.ForeignKey(Document, verbose_name="Documento")
+    imageFile = models.ImageField(upload_to='uploads/%Y/%m/%d/')
+    documentFile = models.FileField(upload_to='uploads/%Y/%m/%d/')
+    uploadDate = models.DateTimeField
+    checksum = models.CharField(max_length=20)
+
