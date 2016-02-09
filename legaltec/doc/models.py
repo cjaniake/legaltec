@@ -46,20 +46,28 @@ class Document(models.Model):
     documentStatus = models.ForeignKey(DocumentStatus, verbose_name="Status do documento")
     expeditionDate = models.DateField("Data de Emissão")
     expirationDate = models.DateField("Data de Expiração")
+    createdDate = models.Date("Criado", auto_now_add=True)
+    modifiedDate = models.Date("Criado", auto_now=True)
     def __unicode__(self):
         return u'%s %s-%s' % (self.documentType.name, self.expeditionDate, self.expirationDate)
 
 class DocumentHistory(models.Model):
     document = models.ForeignKey(Document, verbose_name="Documento")
     user = models.OneToOneField(User, on_delete=models.PROTECT, null=True, blank=True)
-    referenceDate = models.DateTimeField
+    eventDate = models.DateTimeField(auto_now=True)
     operation = models.CharField("Operação", max_length=50)
     snapshot = models.CharField("Resumo dos dados", max_length=1000)
 
-class DocumentImage(models.Model):
+class DocumentImageFile(models.Model):
     document = models.ForeignKey(Document, verbose_name="Documento")
     imageFile = models.ImageField(upload_to='uploads/%Y/%m/%d/')
-    documentFile = models.FileField(upload_to='uploads/%Y/%m/%d/')
-    uploadDate = models.DateTimeField
+    enabled = models.BooleanField
+    uploadDate = models.DateTimeField(auto_now_add=True)
     checksum = models.CharField(max_length=20)
 
+class DocumentFile(models.Model):
+    document = models.ForeignKey(Document, verbose_name="Documento")
+    documentFile = models.FileField(upload_to='uploads/%Y/%m/%d/')
+    enabled = models.BooleanField
+    uploadDate = models.DateTimeField(auto_now_add=True)
+    checksum = models.CharField(max_length=20)
