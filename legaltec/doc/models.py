@@ -25,10 +25,11 @@ FIELD_TYPE_CHOICES = (
 class DocumentTypeField(models.Model):
     documentType = models.ForeignKey(DocumentType, verbose_name="Tipo de documento")
     name = models.CharField("Campo", max_length=50, unique=True)
-    field_type = models.IntegerField("Tipo do campo",
+    fieldType = models.IntegerField("Tipo do campo",
                                       choices=FIELD_TYPE_CHOICES,
                                       default=1)
-    field_choices = models.CharField("Opções", max_length=50)
+    help = models.TextField("Ajuda", null=True, blank=True)
+    fieldChoices = models.TextField("Opções", null=True, blank=True)
     class Meta:
         unique_together = ("documentType", "name")
 
@@ -46,8 +47,8 @@ class Document(models.Model):
     documentStatus = models.ForeignKey(DocumentStatus, verbose_name="Status do documento")
     expeditionDate = models.DateField("Data de Emissão")
     expirationDate = models.DateField("Data de Expiração")
-    createdDate = models.Date("Criado", auto_now_add=True)
-    modifiedDate = models.Date("Criado", auto_now=True)
+    createdDate = models.DateField("Criado", auto_now_add=True)
+    modifiedDate = models.DateField("Criado", auto_now=True)
     def __unicode__(self):
         return u'%s %s-%s' % (self.documentType.name, self.expeditionDate, self.expirationDate)
 

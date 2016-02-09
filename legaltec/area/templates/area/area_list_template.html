@@ -7,7 +7,7 @@
 				{% for object in object_list %}
 				<div class="col-md-4">
 					<div class="thumbnail">
-						<img alt="Bootstrap Thumbnail Third" src="http://lorempixel.com/output/sports-q-c-600-200-1.jpg">
+						<img alt="{{ object.name }}" src="{{ object.src }}">
 						<div class="caption">
 							<h3>
 								{{ object.name }}
@@ -17,7 +17,7 @@
 							</p>
 							<p>
 								{% if object.id %}
-									<a class="btn btn-primary" href="/area/{{ object.id }}/establishments">Entrar</a> <a class="btn" href="{{ object.link }}">Alterar</a>
+									<a class="btn btn-primary" href="{{ object.linkentrar }}">Entrar</a> <a class="btn" href="{{ object.link }}">Alterar</a>
 								{% else %}
 									<a class="btn btn-primary" href="{{ object.link }}">Incluir</a>
 								{% endif %}

@@ -87,10 +87,13 @@ class AreaWrapper:
     def id(self, **kwargs):
         return self.area.id
     content = 'content about area'
-    link = '/area/'
+    def link(self, **kwargs):
+        return '/area/' + str(self.area.id)
+    def linkentrar(self, **kwargs):
+        return '/area/' + str(self.area.id) + '/establishments'
 
 class ListAreaView(TemplateView):
-    template_name = "area_list_template.html"
+    template_name = "area/area_list_template.html"
     def get_context_data(self, **kwargs):
         context = super(ListAreaView, self).get_context_data(**kwargs)
         #context['object_list'] = list(Area.objects.all())
@@ -150,16 +153,19 @@ def edit_area(request, areacode=None):
 class EstablishmentWrapper:
     def __init__(self, estab):
         self.estab = estab
-        self.link = '/area/' + str(estab.area.id) + '/establishment/'
     def name(self, **kwargs):
         return self.estab.name
     def id(self, **kwargs):
         return self.estab.id
     content = 'content about estab'
+    def link(self, **kwargs):
+        return '/area/' + str(self.estab.area.id) + '/establishment/' + str(self.estab.id)
+    def linkentrar(self, **kwargs):
+        return '/documents?establishment=' + str(self.estab.id)
 
 # GET /area/<areacode>/establishments
 class ListEstablishmentView(TemplateView):
-    template_name = "list_template.html"
+    template_name = "area/area_list_template.html"
     def get_context_data(self, **kwargs):
         areacode = kwargs['areacode']
         context = super(ListEstablishmentView, self).get_context_data(**kwargs)

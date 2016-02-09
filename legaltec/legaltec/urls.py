@@ -34,4 +34,10 @@ urlpatterns = [
     url(r'^documentstatuss/', docviews.ListDocumentStatusView.as_view()),
     url(r'^documentstatus/$', docviews.handle_documentstatus),
     url(r'^documentstatus/(?P<docstatuscode>[0-9]+)/$', docviews.edit_documentstatus),
+    url(r'^documenttypes/', docviews.ListDocumentTypeView.as_view()),
+    url(r'^documenttype/$', docviews.handle_documenttype),
+    url(r'^documenttype/(?P<doctypecode>[0-9]+)/$', docviews.edit_documenttype),
+    url(r'^documenttype/(?P<doctypecode>[0-9]+)/fields/', docviews.ListDocumentTypeFieldView.as_view()),
+    url(r'^documenttype/(?P<doctypecode>[0-9]+)/field/$', docviews.handle_documenttypefield),
+    url(r'^documenttype/(?P<doctypecode>[0-9]+)/field/(?P<doctypefieldcode>[0-9]+)/$', docviews.edit_documenttypefield),
 ]
