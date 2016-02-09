@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+from django.core import serializers
+from django.core.serializers import json
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
-from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm
-from doc.models import DocumentStatus, DocumentType, DocumentTypeField
+from area.models import Establishment, Area
+from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentForm
+from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document
+from legaltec.utils import to_JSON
 
 
 class DocumentStatusWrapper:
@@ -222,3 +226,140 @@ def edit_documenttypefield(request, doctypecode=None, doctypefieldcode=None):
             return render(request, 'detail_template.html', {'form': form, 'action':'/documenttypefield/' + doctypefieldcode + '/', 'http_method':'POST'})
     else:
         return HttpResponseRedirect('/documenttypefield/')
+
+class DocumentWrapper:
+    def __init__(self, document):
+        self.document = document
+    def name(self, **kwargs):
+        return self.document.name
+    def id(self, **kwargs):
+        return self.document.id
+    content = 'content about document'
+    link = '/document/'
+
+class ListDocumentView(TemplateView):
+    template_name = "doctable_template.html"
+    def documentAsList(self, document):
+        return [document.establishment.name, document.documentType.name, document.documentStatus.name, document.expirationDate]
+    def get_context_data(self, **kwargs):
+        context = super(ListDocumentView, self).get_context_data(**kwargs)
+        qset = Document.objects
+        selectionList = self.request.session.get('selection_list') # keep serialized version
+        selected = {}                                              # keep object version
+        if(not selectionList):
+           selectionList = {}
+        areacode = self.request.session.get('areacode')
+        if(areacode):
+            area = Area.objects.get(id=int(areacode))
+
+        e = None
+        establishmentId = self.request.GET.get('establishmentId')
+        if(establishmentId):
+            if(establishmentId=='None'):
+                del selectionList['establishment']
+            else:
+                e = Establishment.objects.get(id=establishmentId)
+                selectionList['establishment'] = to_JSON(e)
+                qset = qset.filter(establishment=e)
+                self.request.session['areacode'] = e.area.id
+                area = e.area
+        else:
+            if 'establishment' in selectionList:
+                for obj in serializers.deserialize("json", selectionList['establishment']):
+                    e = obj.object
+        if(e):
+            selected['establishment'] = e
+
+        t = None
+        documentTypeId = self.request.GET.get('documentTypeId')
+        if(documentTypeId):
+            if(documentTypeId=='None'):
+                del selectionList['documentType']
+            else:
+                t = DocumentType.objects.get(id=documentTypeId)
+                selectionList['documentType'] = to_JSON(t)
+                qset = qset.filter(documentType=t)
+        else:
+            if 'documentType' in selectionList:
+                for obj in serializers.deserialize("json", selectionList['documentType']):
+                    t = obj.object
+        if(t):
+            selected['documentType'] = t
+
+        st = None
+        documentStatusId = self.request.GET.get('documentStatusId')
+        if(documentStatusId):
+            if(documentStatusId=='None'):
+                del selectionList['documentStatus']
+            else:
+                st = DocumentStatus.objects.get(id=documentStatusId)
+                selectionList['documentStatus'] = to_JSON(st)
+                qset = qset.filter(documentStatus=st)
+        else:
+            if 'documentStatus' in selectionList:
+                for obj in serializers.deserialize("json", selectionList['documentStatus']):
+                    st = obj.object
+        if(st):
+            selected['documentStatus'] = st
+
+        self.request.session['selection_list'] = selectionList
+        context['area'] = area
+        context['selected'] = selected
+        context['tableheader_list'] = ['Estabelecimento', 'Tipo de Documento', 'Status', 'Data de Expiração']
+        context['object_list'] = map(lambda s: self.documentAsList(s), qset.all())
+        context['area_choices'] = map(lambda s: s.name, Area.objects.all())
+        context['establishment_choices'] = map(lambda s: { 'name' : s.name, 'id' : s.id }, area.establishment_set.all()) if area else []
+        context['document_type_choices'] = map(lambda s: { 'name' : s.name, 'id' : s.id }, DocumentType.objects.all())
+        context['document_status_choices'] = map(lambda s: { 'name' : s.name, 'id' : s.id }, DocumentStatus.objects.all())
+        return context
+
+def handle_document(request):
+    if request.method == 'POST':
+
+        form = DocumentForm(request.POST)
+
+        if form.is_valid():
+            a = Document()
+            a.establishment = form.cleaned_data['establishment']
+            a.documentType = form.cleaned_data['documentType']
+            a.documentStatus = form.cleaned_data['documentStatus']
+            a.expeditionDate = form.cleaned_data['expeditionDate']
+            a.expirationDate = form.cleaned_data['expirationDate']
+
+            a.save()
+
+            return HttpResponseRedirect('/documents/')
+
+    else:
+        form = DocumentForm()
+    return render(request, 'detail_template.html', {'form': form, 'action':'/document/', 'http_method':'POST'})
+
+# GET/POST /area/<documentcode>
+def edit_document(request, documentcode=None):
+    if(documentcode):
+        a = Document.objects.get(id=int(documentcode))
+
+        if request.method == 'POST':
+            #update record with submitted values
+
+            form = DocumentForm(request.POST, instance=a)
+
+            if form.is_valid():
+                a.establishment = form.cleaned_data['establishment']
+                a.documentType = form.cleaned_data['documentType']
+                a.documentStatus = form.cleaned_data['documentStatus']
+                a.expeditionDate = form.cleaned_data['expeditionDate']
+                a.expirationDate = form.cleaned_data['expirationDate']
+
+                a.save()
+
+                return HttpResponseRedirect('/documents/')
+
+            return render(request, 'detail_template.html', {'form': form, 'action':'/document/' + documentcode + '/', 'http_method':'POST'})
+        else:
+            #load record to allow edition
+
+            form = DocumentForm(instance=a)
+            return render(request, 'detail_template.html', {'form': form, 'action':'/document/' + documentcode + '/', 'http_method':'POST'})
+    else:
+        return HttpResponseRedirect('/document/')

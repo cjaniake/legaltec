@@ -40,4 +40,7 @@ urlpatterns = [
     url(r'^documenttype/(?P<doctypecode>[0-9]+)/fields/', docviews.ListDocumentTypeFieldView.as_view()),
     url(r'^documenttype/(?P<doctypecode>[0-9]+)/field/$', docviews.handle_documenttypefield),
     url(r'^documenttype/(?P<doctypecode>[0-9]+)/field/(?P<doctypefieldcode>[0-9]+)/$', docviews.edit_documenttypefield),
+    url(r'^documents', docviews.ListDocumentView.as_view()),
+    url(r'^document/$', docviews.handle_document),
+    url(r'^document/(?P<documentcode>[0-9]+)/$', docviews.edit_document),
 ]

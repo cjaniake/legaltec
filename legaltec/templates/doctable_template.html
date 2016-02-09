@@ -1,0 +1,100 @@
+{% extends "generic_template.html" %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-md-12">
+			<ul class="nav nav-pills">
+			{% for key, value in selected.items %}
+			  <li role="presentation" class="active"><a href="/documents?{{ key }}Id=None">{{ value.name }}<span class="badge">remover</span></a></li>
+			{% endfor %}
+			</ul>
+		<div class="col-md-12">
+	</div>
+
+	<div class="row">
+		<div class="col-md-9">
+			<div class="panel panel-default">
+				<!-- Default panel contents -->
+				<div class="panel-heading">Documentos</div>
+				<table class="table">
+					<tr>
+					{% for tableheader in tableheader_list %}
+						<th>{{ tableheader }}</th>
+					{% endfor %}
+					</tr>
+					{% for object in object_list %}
+					<tr>
+						{% for field in object %}
+						<td>{{ field }}</td>
+						{% endfor %}
+						<td>
+							{% if object.id %}
+								<a class="btn btn-primary" href="/document/{{ object.id }}">Alterar</a>
+							{% else %}
+								<a class="btn btn-primary" href="/document">Incluir</a>
+							{% endif %}
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+
+			</div>
+			<div class="btn-group btn-group-sm" role="group" aria-label="...">
+				<a href="/document" class="btn btn-primary">Incluir Novo Documento</a>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Estabelecimento</h3>
+				</div>
+				<div class="panel-body">
+					<div class="btn-group">
+						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Estabelecimento<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							{% for estab in establishment_choices %}
+							<li><a href="/documents?establishmentId={{ estab.id }}">{{ estab.name }}</a></li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Tipo de Documento</h3>
+				</div>
+				<div class="panel-body">
+					<div class="btn-group">
+						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Tipo de Documento<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							{% for tp in document_type_choices %}
+							<li><a href="/documents?documentTypeId={{ tp.id }}">{{ tp.name }}</a></li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Status</h3>
+				</div>
+				<div class="panel-body">
+					<div class="btn-group">
+						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Status<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							{% for st in document_status_choices %}
+							<li><a href="/documents?documentStatusId={{ st.id }}">{{ st.name }}</a></li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

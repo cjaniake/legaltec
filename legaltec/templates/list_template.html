@@ -13,8 +13,9 @@
 								{{ object.name }}
 							</h3>
 							<p>
-
-								{{ object.content }}
+								{% for child in object.content %}
+								{{ child.content }}
+								{% for %}
 							</p>
 							<p>
 								{% if object.id %}

@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from django.core.serializers import json
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from area.forms import AreaForm, EstablishmentForm, AreaStatusForm
 from area.models import Area, Establishment, AreaStatus
+from legaltec.utils import to_JSON
 
 
 class AreaStatusWrapper:
@@ -157,11 +159,17 @@ class EstablishmentWrapper:
         return self.estab.name
     def id(self, **kwargs):
         return self.estab.id
-    content = 'content about estab'
+    def content(self, **kwargs):
+        documentArray = self.estab.document_set.all()
+        return map(self.documentLink, documentArray)
     def link(self, **kwargs):
         return '/area/' + str(self.estab.area.id) + '/establishment/' + str(self.estab.id)
     def linkentrar(self, **kwargs):
-        return '/documents?establishment=' + str(self.estab.id)
+        return '/documents?establishmentId=' + str(self.estab.id)
+    def documentLink(self, document):
+        return "{} (expires {}) {}<br />".format(document.documentType.name, document.expirationDate, self.toRelative(document.expirationDate))
+    def toRelative(self, date):
+        return "3 days ago"
 
 # GET /area/<areacode>/establishments
 class ListEstablishmentView(TemplateView):
@@ -171,8 +179,7 @@ class ListEstablishmentView(TemplateView):
         context = super(ListEstablishmentView, self).get_context_data(**kwargs)
         area = Area.objects.get(id=int(areacode))
         context['area'] = area
-        #establishmentArray = area.establishment_set.values
-        #context['object_list'] = establishmentArray
+        self.request.session['areacode'] = areacode
         establishmentArray = area.establishment_set.all()
         context['object_list'] = map(lambda s: EstablishmentWrapper(s), establishmentArray)
         new = Establishment()
@@ -232,3 +239,4 @@ def edit_establishment(request, areacode=None, establishmentid=None):
             form = EstablishmentForm(instance=l)
             return render(request, 'detail_template.html', {'form': form, 'action':'/area/' + areacode + '/establishment/' + establishmentid + '/', 'http_method':'POST', 'area': area})
         return HttpResponseRedirect('/area/' + areacode + '/establishments') if areacode else HttpResponseRedirect('/areas/')
+

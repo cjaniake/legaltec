@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 
-from doc.models import DocumentStatus, DocumentType, DocumentTypeField
+from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document
 
 
 class DocumentStatusForm(ModelForm):
@@ -17,3 +17,9 @@ class DocumentTypeFieldForm(ModelForm):
     class Meta:
         model = DocumentTypeField
         fields = ['name','fieldType','help','fieldChoices']
+
+class DocumentForm(ModelForm):
+    class Meta:
+        model = Document
+        fields = ['establishment','documentType','documentStatus','expeditionDate','expirationDate']
+

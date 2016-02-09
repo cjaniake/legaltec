@@ -48,7 +48,7 @@ class Document(models.Model):
     expeditionDate = models.DateField("Data de Emissão")
     expirationDate = models.DateField("Data de Expiração")
     createdDate = models.DateField("Criado", auto_now_add=True)
-    modifiedDate = models.DateField("Criado", auto_now=True)
+    modifiedDate = models.DateField("Alterado", auto_now=True)
     def __unicode__(self):
         return u'%s %s-%s' % (self.documentType.name, self.expeditionDate, self.expirationDate)
 
