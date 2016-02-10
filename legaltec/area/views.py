@@ -2,12 +2,14 @@
 import logging
 
 from django.core.serializers import json
+from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from area.forms import AreaForm, EstablishmentForm, AreaStatusForm
 from area.models import Area, Establishment, AreaStatus
+from doc.models import Document
 from legaltec.utils import to_JSON
 
 
@@ -88,11 +90,20 @@ class AreaWrapper:
         return self.area.name
     def id(self, **kwargs):
         return self.area.id
-    content = 'content about area'
+    def content(self, **kargs):
+        inner_qs = Establishment.objects.filter(area__id__exact=self.area.id)
+        qset = Document.objects.filter(establishment__in=inner_qs, documentStatus__enabled=True)
+        return qset.order_by('expirationDate')[:6]
     def link(self, **kwargs):
         return '/area/' + str(self.area.id)
     def linkentrar(self, **kwargs):
         return '/area/' + str(self.area.id) + '/establishments'
+    def dataseries(self, **kwargs):
+        inner_qs = Establishment.objects.filter(area__id__exact=self.area.id)
+        qset = Document.objects.filter(establishment__in=inner_qs, documentStatus__enabled=True)
+        qset = qset.annotate(num_docs=Count('documentStatus'))
+        return map(lambda d: {'value':d.num_docs, 'label':d.documentStatus.name, 'color':d.documentStatus.colorCode}, qset)
+
 
 class ListAreaView(TemplateView):
     template_name = "area/area_list_template.html"
@@ -103,6 +114,10 @@ class ListAreaView(TemplateView):
         new = Area()
         new.name = "<nova>"
         context['object_list'].append(AreaWrapper(new))
+        if 'areacode' in self.request.session:
+            del self.request.session['areacode']
+        if 'selection_list' in self.request.session:
+            del self.request.session['selection_list']
         return context
 
 def handle_area(request):
@@ -159,21 +174,21 @@ class EstablishmentWrapper:
         return self.estab.name
     def id(self, **kwargs):
         return self.estab.id
-    def content(self, **kwargs):
-        documentArray = self.estab.document_set.all()
-        return map(self.documentLink, documentArray)
+    def content(self, **kargs):
+        qset = Document.objects.filter(establishment__id=self.estab.id, documentStatus__enabled=True)
+        return qset.order_by('expirationDate')[:6]
     def link(self, **kwargs):
         return '/area/' + str(self.estab.area.id) + '/establishment/' + str(self.estab.id)
     def linkentrar(self, **kwargs):
         return '/documents?establishmentId=' + str(self.estab.id)
-    def documentLink(self, document):
-        return "{} (expires {}) {}<br />".format(document.documentType.name, document.expirationDate, self.toRelative(document.expirationDate))
-    def toRelative(self, date):
-        return "3 days ago"
+    def dataseries(self, **kwargs):
+        qset = Document.objects.filter(establishment__id=self.estab.id, documentStatus__enabled=True)
+        qset = qset.annotate(num_docs=Count('documentStatus'))
+        return map(lambda d: {'value':d.num_docs, 'label':d.documentStatus.name, 'color':d.documentStatus.colorCode}, qset)
 
 # GET /area/<areacode>/establishments
 class ListEstablishmentView(TemplateView):
-    template_name = "area/area_list_template.html"
+    template_name = "area/stablishment_list_template.html"
     def get_context_data(self, **kwargs):
         areacode = kwargs['areacode']
         context = super(ListEstablishmentView, self).get_context_data(**kwargs)

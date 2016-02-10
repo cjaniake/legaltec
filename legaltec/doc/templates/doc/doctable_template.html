@@ -3,7 +3,7 @@
 {% block content %}
 	<div class="row">
 		<div class="col-md-12">
-			<ul class="nav nav-pills">
+			<ul class="nav nav-pills btn-sm">
 			{% for key, value in selected.items %}
 			  <li role="presentation" class="active"><a href="/documents?{{ key }}Id=None">{{ value.name }}<span class="badge">remover</span></a></li>
 			{% endfor %}
@@ -11,7 +11,7 @@
 		<div class="col-md-12">
 	</div>
 
-	<div class="row">
+	<div class="row top-margin">
 		<div class="col-md-9">
 			<div class="panel panel-default">
 				<!-- Default panel contents -->
@@ -24,15 +24,17 @@
 					</tr>
 					{% for object in object_list %}
 					<tr>
-						{% for field in object %}
-						<td>{{ field }}</td>
-						{% endfor %}
+						<td>{{ object.establishment.name }}</td>
+						<td>{{ object.documentType.name }}</td>
+						<td>{{ object.documentStatus.name}}</td>
+						<td>{{ object.expirationDate}}</td>
+						<td>{{ object.expirationDate|timeuntil}}</td>
 						<td>
-							{% if object.id %}
+							<div class="btn-group btn-group-sm" role="group" aria-label="...">
+								<a class="btn btn-default" href="/document/{{ object.id }}/history">História</a>
+								<a class="btn btn-default" href="/document/{{ object.id }}/files">Arquivos</a>
 								<a class="btn btn-primary" href="/document/{{ object.id }}">Alterar</a>
-							{% else %}
-								<a class="btn btn-primary" href="/document">Incluir</a>
-							{% endif %}
+							</div>
 						</td>
 					</tr>
 					{% endfor %}

@@ -65,6 +65,7 @@ class DocumentImageFile(models.Model):
     enabled = models.BooleanField
     uploadDate = models.DateTimeField(auto_now_add=True)
     checksum = models.CharField(max_length=20)
+    size = models.CharField(max_length=20)
 
 class DocumentFile(models.Model):
     document = models.ForeignKey(Document, verbose_name="Documento")
@@ -72,3 +73,4 @@ class DocumentFile(models.Model):
     enabled = models.BooleanField
     uploadDate = models.DateTimeField(auto_now_add=True)
     checksum = models.CharField(max_length=20)
+    size = models.CharField(max_length=20)

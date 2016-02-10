@@ -20,13 +20,13 @@
 		<div class="row">
 			<div class="col-md-12">
 				<ul class="nav nav-pills">
-					<li class="active">
+					<li>
 						<a href="/areas">Áreas</a>
 					</li>
 
 					<li {% if not area %} class="disabled" {% endif %}><a href="/area/{{ area.id }}/establishments">Estabelecimentos</a></li>
 
-					<li class="disabled">
+					<li {% if not area %} class="disabled" {% endif %}>
 						<a href="/documents">Documentos</a>
 					</li>
 					<li class="dropdown pull-right">
@@ -80,7 +80,8 @@
 		</div>
 
 
-		{% block breadcrumb %}<div class="row">
+		{% block breadcrumb %}
+		<div class="row">
 		<ol class="breadcrumb">
 			<li><a href="/areas"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
 			{% if area %}

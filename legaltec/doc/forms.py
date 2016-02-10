@@ -23,3 +23,8 @@ class DocumentForm(ModelForm):
         model = Document
         fields = ['establishment','documentType','documentStatus','expeditionDate','expirationDate']
 
+class DocumentDetailForm(ModelForm):
+    class Meta:
+        model = Document
+        fields = fields = '__all__'
+

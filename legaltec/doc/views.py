@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.serializers import json
 from django.http import HttpResponseRedirect
@@ -6,8 +7,8 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from area.models import Establishment, Area
-from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentForm
-from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document
+from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentForm, DocumentDetailForm
+from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document, DocumentHistory
 from legaltec.utils import to_JSON
 
 
@@ -238,7 +239,7 @@ class DocumentWrapper:
     link = '/document/'
 
 class ListDocumentView(TemplateView):
-    template_name = "doctable_template.html"
+    template_name = "doc/doctable_template.html"
     def documentAsList(self, document):
         return [document.establishment.name, document.documentType.name, document.documentStatus.name, document.expirationDate]
     def get_context_data(self, **kwargs):
@@ -256,7 +257,8 @@ class ListDocumentView(TemplateView):
         establishmentId = self.request.GET.get('establishmentId')
         if(establishmentId):
             if(establishmentId=='None'):
-                del selectionList['establishment']
+                if 'establishment' in selectionList:
+                    del selectionList['establishment']
             else:
                 e = Establishment.objects.get(id=establishmentId)
                 selectionList['establishment'] = to_JSON(e)
@@ -269,12 +271,17 @@ class ListDocumentView(TemplateView):
                     e = obj.object
         if(e):
             selected['establishment'] = e
+            qset = qset.filter(establishment=e)
+        else:
+            inner_qs = Establishment.objects.filter(area__id__exact=area.id)
+            qset = qset.filter(establishment__in=inner_qs)
 
         t = None
         documentTypeId = self.request.GET.get('documentTypeId')
         if(documentTypeId):
             if(documentTypeId=='None'):
-                del selectionList['documentType']
+                if 'documentType' in selectionList:
+                    del selectionList['documentType']
             else:
                 t = DocumentType.objects.get(id=documentTypeId)
                 selectionList['documentType'] = to_JSON(t)
@@ -290,7 +297,8 @@ class ListDocumentView(TemplateView):
         documentStatusId = self.request.GET.get('documentStatusId')
         if(documentStatusId):
             if(documentStatusId=='None'):
-                del selectionList['documentStatus']
+                if 'documentStatus' in selectionList:
+                    del selectionList['documentStatus']
             else:
                 st = DocumentStatus.objects.get(id=documentStatusId)
                 selectionList['documentStatus'] = to_JSON(st)
@@ -306,14 +314,22 @@ class ListDocumentView(TemplateView):
         context['area'] = area
         context['selected'] = selected
         context['tableheader_list'] = ['Estabelecimento', 'Tipo de Documento', 'Status', 'Data de Expiração']
-        context['object_list'] = map(lambda s: self.documentAsList(s), qset.all())
+        context['object_list'] = map(lambda s: s, qset.all())
         context['area_choices'] = map(lambda s: s.name, Area.objects.all())
         context['establishment_choices'] = map(lambda s: { 'name' : s.name, 'id' : s.id }, area.establishment_set.all()) if area else []
         context['document_type_choices'] = map(lambda s: { 'name' : s.name, 'id' : s.id }, DocumentType.objects.all())
         context['document_status_choices'] = map(lambda s: { 'name' : s.name, 'id' : s.id }, DocumentStatus.objects.all())
         return context
 
+# GET/POST /document/
+@login_required
 def handle_document(request):
+    area = None
+    areacode = request.session.get('areacode')
+    if(areacode):
+        area = Area.objects.get(id=int(areacode))
+
+
     if request.method == 'POST':
 
         form = DocumentForm(request.POST)
@@ -328,13 +344,32 @@ def handle_document(request):
 
             a.save()
 
+            h = DocumentHistory()
+            h.user = request.user
+            h.operation = "CREATION"
+            h.snapshot = to_JSON(a)
+
+            a.documenthistory_set.add()
+
             return HttpResponseRedirect('/documents/')
 
     else:
-        form = DocumentForm()
-    return render(request, 'detail_template.html', {'form': form, 'action':'/document/', 'http_method':'POST'})
+        selectionList = request.session.get('selection_list')
+        e = None
+        if 'establishment' in selectionList:
+            for obj in serializers.deserialize("json", selectionList['establishment']):
+                e = obj.object
+        t = None
+        if 'documentType' in selectionList:
+            for obj in serializers.deserialize("json", selectionList['documentType']):
+                t = obj.object
+        st = None
+        form = DocumentForm(initial={'establishment': e,'documentType': t })
 
-# GET/POST /area/<documentcode>
+    return render(request, 'detail_template.html', {'form': form, 'action':'/document/', 'http_method':'POST', 'area' : area})
+
+# GET/POST /document/<documentcode>
+@login_required
 def edit_document(request, documentcode=None):
     if(documentcode):
         a = Document.objects.get(id=int(documentcode))
@@ -353,6 +388,13 @@ def edit_document(request, documentcode=None):
 
                 a.save()
 
+                h = DocumentHistory()
+                h.user = request.user
+                h.operation = "MODIFICATION"
+                h.snapshot = to_JSON(a)
+
+                a.documenthistory_set.add()
+
                 return HttpResponseRedirect('/documents/')
 
             return render(request, 'detail_template.html', {'form': form, 'action':'/document/' + documentcode + '/', 'http_method':'POST'})
@@ -363,3 +405,29 @@ def edit_document(request, documentcode=None):
             return render(request, 'detail_template.html', {'form': form, 'action':'/document/' + documentcode + '/', 'http_method':'POST'})
     else:
         return HttpResponseRedirect('/document/')
+
+
+class ListDocumentFileView(TemplateView):
+    template_name = "doc/docfiles_template.html"
+    def get_context_data(self, **kwargs):
+        context = super(ListDocumentFileView, self).get_context_data(**kwargs)
+        documentcode = kwargs['documentcode']
+        document = Document.objects.get(id=int(documentcode))
+        context['document'] = document
+        context['form'] = DocumentDetailForm(instance=document)
+        context['file_list'] = document.documentfile_set.values()
+        context['imagefile_list'] = document.documentimagefile_set.values()
+        return context
+
+# GET/POST /document/
+@login_required
+def handle_documentupload(request):
+    area = None
+    areacode = request.session.get('areacode')
+    if(areacode):
+        area = Area.objects.get(id=int(areacode))
+
+
+
+class ListDocumentHistoryView(TemplateView):
+    template_name = "doc/dochistory_template.html"

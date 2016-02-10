@@ -26,7 +26,6 @@
 							</h3>
 								{% for doc in object.content %}
 								<p>
-									{{ doc.establishment.name }}<br />
 									<strong>{{ doc.documentType.name }}</strong><br />
 									{{ doc.expirationDate }} - {{ doc.expirationDate|timeuntil}}
 								</p>

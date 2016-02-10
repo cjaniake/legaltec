@@ -1,0 +1,81 @@
+{% extends "generic_template.html" %}
+
+{% block content %}
+	<div class="row">
+		<div class="panel panel-default">
+			{% for field in form %}
+			<div class="col-md-6">{{ field.label_tag }}:{{ field }}</div>
+			{% endfor %}
+		</div>
+	</div>
+
+	<div class="row top-margin">
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				<!-- Default panel contents -->
+				<div class="panel-heading">Documentos</div>
+				<table class="table">
+					<tr>
+						<th>Arquivo</th>
+						<th>Tamanho</th>
+						<th>Data Upload</th>
+					</tr>
+					{% for object in file_list %}
+					<tr>
+						<td>{{ object.establishment.name }}</td>
+						<td>{{ object.documentType.name }}</td>
+						<td>{{ object.documentStatus.name}}</td>
+						<td>{{ object.expirationDate}}</td>
+						<td>{{ object.expirationDate|timeuntil}}</td>
+						<td>
+							<div class="btn-group btn-group-sm" role="group" aria-label="...">
+								<a class="btn btn-default" href="/upload/{{ document.href }}">Download</a>
+								<a class="btn btn-primary" href="/upload/{{ document.href }}">Ver</a>
+							</div>
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+
+			</div>
+			<div class="btn-group btn-group-sm" role="group" aria-label="...">
+				<a href="/document" class="btn btn-primary">Upload Documento</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="row top-margin">
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				<!-- Default panel contents -->
+				<div class="panel-heading">Imagens</div>
+				<table class="table">
+					<tr>
+						<th>Arquivo</th>
+						<th>Tamanho</th>
+						<th>Data Upload</th>
+					</tr>
+					{% for object in imagefile_list %}
+					<tr>
+						<td>{{ object.establishment.name }}</td>
+						<td>{{ object.documentType.name }}</td>
+						<td>{{ object.documentStatus.name}}</td>
+						<td>{{ object.expirationDate}}</td>
+						<td>{{ object.expirationDate|timeuntil}}</td>
+						<td>
+							<div class="btn-group btn-group-sm" role="group" aria-label="...">
+								<a class="btn btn-default" href="/upload/{{ document.href }}">Download</a>
+								<a class="btn btn-primary" href="/upload/{{ document.href }}">Ver</a>
+							</div>
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+
+			</div>
+			<div class="btn-group btn-group-sm" role="group" aria-label="...">
+				<a href="/document" class="btn btn-primary">Upload Imagem</a>
+			</div>
+		</div>
+	</div>
+{% endblock %}

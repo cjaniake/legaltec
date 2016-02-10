@@ -3,9 +3,8 @@
 {% block content %}
 	<div class="row">
 		<div class="col-md-12">
-			<div class="row">
 				<form action="{{ action }}" method="{{ http_method }}" enctype="multipart/form-data">
-					<table class="fullwidth" style="width:100%">
+					<table class="fullwidth">
 					{% csrf_token %}
 					{% for field in form %}
 						<tr>
@@ -30,7 +29,6 @@
 					</td>
 					</table>
 				</form>
-			</div>
 		</div>
 	</div>
   	<script src="/static/js/jquery.colorPicker.min.js"></script>
