@@ -1,0 +1,44 @@
+{% extends "generic_template.html" %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-md-12">
+			<div class="col-md-6"><strong>Documento:</strong> {{ document.id }}</div>
+			<div class="col-md-6"><strong>Estabelecimento:</strong> {{ document.establishment.name }}</div>
+			<div class="col-md-6"><strong>Tipo de documento:</strong> {{ document.documentType.name }}</div>
+			<div class="col-md-6"><strong>Status do documento:</strong> {{ document.documentStatus.name }}</div>
+			<div class="col-md-6"><strong>Data de Emissão:</strong> {{ document.expeditionDate }}</div>
+			<div class="col-md-6"><strong>Data de Expiração:</strong> {{ document.expirationDate }}</div>
+			<div class="col-md-6"><strong>Data de Criação:</strong> {{ document.creationDate }}</div>
+			<div class="col-md-6"><strong>Última Alteração:</strong> {{ document.modifiedDate }}</div>
+		</div>
+	</div>
+
+	<div class="row top-margin">
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">Histórico</div>
+				<table class="table">
+					<tr>
+						<th>Usuário</th>
+						<th>Evento</th>
+						<th>Data Evento</th>
+					</tr>
+					{% for object in event_list %}
+					<tr>
+						<td>{{ object.user.username }}</td>
+						<td>{{ object.operation }}</td>
+						<td>{{ object.eventDate }}</td>
+						<td>
+							<div class="btn-group btn-group-sm" role="group" aria-label="...">
+								<a class="btn btn-primary" href="/upload/{{ document.href }}">Ver</a>
+							</div>
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}

@@ -1,5 +1,4 @@
-from django.forms import ModelForm
-
+from django.forms import ModelForm, Form, FileField, Field, ImageField
 from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document
 
 
@@ -26,5 +25,16 @@ class DocumentForm(ModelForm):
 class DocumentDetailForm(ModelForm):
     class Meta:
         model = Document
-        fields = fields = '__all__'
+        fields = '__all__'
+    def __init__(self, *args, **kwargs):
+        super(DocumentDetailForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['readonly'] = True
+            field.widget.attrs['disabled'] = True
 
+
+class DocumentFileUploadForm(Form):
+    file = FileField(label='Arquivo')
+
+class DocumentImageFileUploadForm(Form):
+    file = ImageField(label='Arquivo')

@@ -19,7 +19,7 @@
     <div class="container-fluid">
 		<div class="row">
 			<div class="col-md-12">
-				<ul class="nav nav-pills">
+				<ul class="nav navbar-nav nav-pills">
 					<li>
 						<a href="/areas">Áreas</a>
 					</li>
@@ -29,8 +29,29 @@
 					<li {% if not area %} class="disabled" {% endif %}>
 						<a href="/documents">Documentos</a>
 					</li>
-					<li class="dropdown pull-right">
-						 <a href="#" data-toggle="dropdown" class="dropdown-toggle">Configurar<strong class="caret"></strong></a>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Configurar<strong class="caret"></strong></a>
+						<ul class="dropdown-menu">
+							<li>
+								<a href="/documenttypes">Tipos de Documento</a>
+							</li>
+							<li>
+								<a href="/documentstatuss">Status de Documentos</a>
+							</li>
+							<li>
+								<a href="#">Preferências</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="nav navbar-nav nav-pills navbar-right">
+					<li>
+						<a href="#">Ajuda</a>
+					</li>
+					<li class="dropdown">
+						{% if not request.user.is_authenticated %}<a href="{% url django.contrib.auth.login %}">Login</a>
+						{% else %}
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ request.user.username }}<strong class="caret"></strong></a>
 						<ul class="dropdown-menu">
 							<li>
 								<a href="/documenttypes">Tipos de Documento</a>
@@ -50,6 +71,7 @@
 								<a href="#">Segurança</a>
 							</li>
 						</ul>
+						{% endif %}
 					</li>
 				</ul>
 			</div>

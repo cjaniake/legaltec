@@ -2,17 +2,21 @@
 
 {% block content %}
 	<div class="row">
-		<div class="panel panel-default">
-			{% for field in form %}
-			<div class="col-md-6">{{ field.label_tag }}:{{ field }}</div>
-			{% endfor %}
+		<div class="col-md-12">
+			<div class="col-md-6"><strong>Documento:</strong> {{ document.id }}</div>
+			<div class="col-md-6"><strong>Estabelecimento:</strong> {{ document.establishment.name }}</div>
+			<div class="col-md-6"><strong>Tipo de documento:</strong> {{ document.documentType.name }}</div>
+			<div class="col-md-6"><strong>Status do documento:</strong> {{ document.documentStatus.name }}</div>
+			<div class="col-md-6"><strong>Data de Emissão:</strong> {{ document.expeditionDate }}</div>
+			<div class="col-md-6"><strong>Data de Expiração:</strong> {{ document.expirationDate }}</div>
+			<div class="col-md-6"><strong>Data de Criação:</strong> {{ document.creationDate }}</div>
+			<div class="col-md-6"><strong>Última Alteração:</strong> {{ document.modifiedDate }}</div>
 		</div>
 	</div>
 
 	<div class="row top-margin">
 		<div class="col-md-12">
 			<div class="panel panel-default">
-				<!-- Default panel contents -->
 				<div class="panel-heading">Documentos</div>
 				<table class="table">
 					<tr>
@@ -22,15 +26,13 @@
 					</tr>
 					{% for object in file_list %}
 					<tr>
-						<td>{{ object.establishment.name }}</td>
-						<td>{{ object.documentType.name }}</td>
-						<td>{{ object.documentStatus.name}}</td>
-						<td>{{ object.expirationDate}}</td>
-						<td>{{ object.expirationDate|timeuntil}}</td>
+						<td>{{ object.documentFile.name }}</td>
+						<td>{{ object.size|filesizeformat }}</td>
+						<td>{{ object.uploadDate }}</td>
 						<td>
 							<div class="btn-group btn-group-sm" role="group" aria-label="...">
-								<a class="btn btn-default" href="/upload/{{ document.href }}">Download</a>
-								<a class="btn btn-primary" href="/upload/{{ document.href }}">Ver</a>
+								<a class="btn btn-default" href="{{ object.documentFile.url }}">Download</a>
+								<a class="btn btn-primary" href="{{ object.documentFile.url }}">Ver</a>
 							</div>
 						</td>
 					</tr>
@@ -38,16 +40,19 @@
 				</table>
 
 			</div>
-			<div class="btn-group btn-group-sm" role="group" aria-label="...">
-				<a href="/document" class="btn btn-primary">Upload Documento</a>
-			</div>
+			<form action="/document/{{ document.id }}/file/" method="POST" enctype="multipart/form-data">
+					{% csrf_token %}
+					{% for field in file_upload_form %}
+					{{ field }}
+					{% endfor %}
+					<button type="submit" class="btn btn-primary btn-sm">Upload Documento</button>
+			</form>
 		</div>
 	</div>
 
 	<div class="row top-margin">
 		<div class="col-md-12">
 			<div class="panel panel-default">
-				<!-- Default panel contents -->
 				<div class="panel-heading">Imagens</div>
 				<table class="table">
 					<tr>
@@ -57,11 +62,9 @@
 					</tr>
 					{% for object in imagefile_list %}
 					<tr>
-						<td>{{ object.establishment.name }}</td>
-						<td>{{ object.documentType.name }}</td>
-						<td>{{ object.documentStatus.name}}</td>
-						<td>{{ object.expirationDate}}</td>
-						<td>{{ object.expirationDate|timeuntil}}</td>
+						<td>{{ object.imageFile.name }}</td>
+						<td>{{ object.size|filesizeformat }}</td>
+						<td>{{ object.uploadDate }}</td>
 						<td>
 							<div class="btn-group btn-group-sm" role="group" aria-label="...">
 								<a class="btn btn-default" href="/upload/{{ document.href }}">Download</a>
@@ -73,9 +76,13 @@
 				</table>
 
 			</div>
-			<div class="btn-group btn-group-sm" role="group" aria-label="...">
-				<a href="/document" class="btn btn-primary">Upload Imagem</a>
-			</div>
+			<form action="/document/{{ document.id }}/imagefile/" method="POST" enctype="multipart/form-data">
+					{% csrf_token %}
+					{% for field in imagefile_upload_form %}
+					{{ field }}
+					{% endfor %}
+					<button type="submit" class="btn btn-primary btn-sm">Upload Imagem</button>
+			</form>
 		</div>
 	</div>
 {% endblock %}

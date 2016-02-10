@@ -7,8 +7,10 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from area.models import Establishment, Area
-from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentForm, DocumentDetailForm
-from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document, DocumentHistory
+from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document, DocumentHistory, DocumentFile, \
+    DocumentImageFile
+from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentForm, DocumentDetailForm, \
+    DocumentImageFileUploadForm, DocumentFileUploadForm
 from legaltec.utils import to_JSON
 
 
@@ -349,7 +351,7 @@ def handle_document(request):
             h.operation = "CREATION"
             h.snapshot = to_JSON(a)
 
-            a.documenthistory_set.add()
+            a.documenthistory_set.add(h)
 
             return HttpResponseRedirect('/documents/')
 
@@ -393,7 +395,7 @@ def edit_document(request, documentcode=None):
                 h.operation = "MODIFICATION"
                 h.snapshot = to_JSON(a)
 
-                a.documenthistory_set.add()
+                a.documenthistory_set.add(h)
 
                 return HttpResponseRedirect('/documents/')
 
@@ -415,19 +417,68 @@ class ListDocumentFileView(TemplateView):
         document = Document.objects.get(id=int(documentcode))
         context['document'] = document
         context['form'] = DocumentDetailForm(instance=document)
-        context['file_list'] = document.documentfile_set.values()
-        context['imagefile_list'] = document.documentimagefile_set.values()
+        context['file_list'] = DocumentFile.objects.filter(document__id=document.id).all()
+        context['imagefile_list'] = DocumentImageFile.objects.filter(document__id=document.id).all()
+        context['file_upload_form'] = DocumentFileUploadForm()
+        context['imagefile_upload_form'] = DocumentImageFileUploadForm()
+        context['area'] = document.establishment.area
         return context
 
-# GET/POST /document/
+# GET/POST /document/<documentcode>/file/
 @login_required
-def handle_documentupload(request):
-    area = None
-    areacode = request.session.get('areacode')
-    if(areacode):
-        area = Area.objects.get(id=int(areacode))
+def handle_documentupload(request, documentcode):
+    doc = Document.objects.get(id=int(documentcode));
+    form = DocumentFileUploadForm(request.POST, request.FILES)
+    if form.is_valid():
+        df = DocumentFile()
+        df.documentFile = form.cleaned_data['file']
+        df.enabled = True
+        df.checksum = 'TODO'
+        df.size = str(form.cleaned_data['file'].size)
+
+        doc.documentfile_set.add(df)
+
+        h = DocumentHistory()
+        h.user = request.user
+        h.operation = "FILE UPLOAD " + df.documentFile.name
+        h.snapshot = to_JSON(doc)
+
+        doc.documenthistory_set.add(h)
+
+    return HttpResponseRedirect('/document/' + documentcode + '/files/')
 
 
+# GET/POST /document/<documentcode>/imagefile/
+@login_required
+def handle_imageupload(request, documentcode):
+    doc = Document.objects.get(id=int(documentcode))
+    form = DocumentImageFileUploadForm(request.POST, request.FILES)
+    if form.is_valid():
+        df = DocumentImageFile()
+        df.imageFile = form.cleaned_data['file']
+        df.enabled = True
+        df.checksum = 'TODO'
+        df.size = str(form.cleaned_data['file'].size)
+
+        doc.documentimagefile_set.add(df)
+
+        h = DocumentHistory()
+        h.user = request.user
+        h.operation = "IMAGE UPLOAD " + df.imageFile.name
+        h.snapshot = to_JSON(doc)
+
+        doc.documenthistory_set.add(h)
+
+    return HttpResponseRedirect('/document/' + documentcode + '/files/')
 
 class ListDocumentHistoryView(TemplateView):
     template_name = "doc/dochistory_template.html"
+    def get_context_data(self, **kwargs):
+        context = super(ListDocumentHistoryView, self).get_context_data(**kwargs)
+        documentcode = kwargs['documentcode']
+        document = Document.objects.get(id=int(documentcode))
+        context['document'] = document
+        context['form'] = DocumentDetailForm(instance=document)
+        context['event_list'] = DocumentHistory.objects.filter(document__id=document.id).all()
+        context['area'] = document.establishment.area
+        return context

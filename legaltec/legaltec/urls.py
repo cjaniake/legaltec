@@ -45,5 +45,6 @@ urlpatterns = [
     url(r'^document/(?P<documentcode>[0-9]+)/$', docviews.edit_document),
     url(r'^document/(?P<documentcode>[0-9]+)/files/$', docviews.ListDocumentFileView.as_view()),
     url(r'^document/(?P<documentcode>[0-9]+)/file/$', docviews.handle_documentupload),
+    url(r'^document/(?P<documentcode>[0-9]+)/imagefile/$', docviews.handle_imageupload),
     url(r'^document/(?P<documentcode>[0-9]+)/history/$', docviews.ListDocumentHistoryView.as_view()),
 ]
