@@ -18,6 +18,9 @@ from django.contrib import admin
 
 from area import views as areaviews
 from doc import views as docviews
+from django.conf.urls.static import static
+
+from legaltec import settings
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
@@ -28,9 +31,6 @@ urlpatterns = [
     url(r'^area/(?P<areacode>[0-9]+)/establishments/$', areaviews.ListEstablishmentView.as_view()),
     url(r'^area/(?P<areacode>[0-9]+)/establishment/$', areaviews.handle_establishment),
     url(r'^area/(?P<areacode>[0-9]+)/establishment/(?P<establishmentid>[0-9]+)/$', areaviews.edit_establishment),
-    url(r'^areastatuss/', areaviews.ListAreaStatusView.as_view()),
-    url(r'^areastatus/$', areaviews.handle_areastatus),
-    url(r'^areastatus/(?P<areastatuscode>[0-9]+)/$', areaviews.edit_areastatus),
     url(r'^documentstatuss/', docviews.ListDocumentStatusView.as_view()),
     url(r'^documentstatus/$', docviews.handle_documentstatus),
     url(r'^documentstatus/(?P<docstatuscode>[0-9]+)/$', docviews.edit_documentstatus),
@@ -40,11 +40,12 @@ urlpatterns = [
     url(r'^documenttype/(?P<doctypecode>[0-9]+)/fields/', docviews.ListDocumentTypeFieldView.as_view()),
     url(r'^documenttype/(?P<doctypecode>[0-9]+)/field/$', docviews.handle_documenttypefield),
     url(r'^documenttype/(?P<doctypecode>[0-9]+)/field/(?P<doctypefieldcode>[0-9]+)/$', docviews.edit_documenttypefield),
-    url(r'^documents', docviews.ListDocumentView.as_view()),
+    url(r'^documents/$', docviews.ListDocumentView.as_view()),
     url(r'^document/$', docviews.handle_document),
     url(r'^document/(?P<documentcode>[0-9]+)/$', docviews.edit_document),
     url(r'^document/(?P<documentcode>[0-9]+)/files/$', docviews.ListDocumentFileView.as_view()),
     url(r'^document/(?P<documentcode>[0-9]+)/file/$', docviews.handle_documentupload),
     url(r'^document/(?P<documentcode>[0-9]+)/imagefile/$', docviews.handle_imageupload),
     url(r'^document/(?P<documentcode>[0-9]+)/history/$', docviews.ListDocumentHistoryView.as_view()),
-]
+    url(r'^updateDocumentStatus/$', docviews.update_document_status),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

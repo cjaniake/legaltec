@@ -1,17 +1,11 @@
 from django.forms import ModelForm
 
-from area.models import Area, Establishment, AreaStatus
-
-
-class AreaStatusForm(ModelForm):
-    class Meta:
-        model = AreaStatus
-        fields = ['name','minimumValidity','enabled','colorCode']
+from area.models import Area, Establishment
 
 class AreaForm(ModelForm):
     class Meta:
         model = Area
-        fields = ['name','areaStatus','adminEmail']
+        fields = ['name','enabled','adminEmail','validUntil','applyPermissions']
 
 class EstablishmentForm(ModelForm):
     class Meta:

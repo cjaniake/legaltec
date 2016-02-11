@@ -7,15 +7,17 @@
 				{% for object in object_list %}
 				<div class="col-md-4">
 					<div class="thumbnail">
-						<img alt="{{ object.name }}" src="{{ object.src }}">
+						{% if object.id %}
+						<span class="bigicon glyphicon {{ object.glyphicon }}" aria-hidden="true"></span>
+						{% else %}
+						<span class="bigicon glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+						{% endif %}
 						<div class="caption">
 							<h3>
 								{{ object.name }}
 							</h3>
 							<p>
-								{% for child in object.content %}
-								{{ child.content }}
-								{% for %}
+								{{ object.content }}
 							</p>
 							<p>
 								{% if object.id %}

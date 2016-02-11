@@ -5,16 +5,6 @@ from area.models import Establishment
 
 from django.contrib.auth.models import User
 
-class DocumentType(models.Model):
-    name = models.CharField("Tipo de documento", max_length=50, unique=True)
-    validityPeriod = models.IntegerField("Validade em meses")
-    description = models.CharField("Descrição", max_length=50, null=True, blank=True)
-    group = models.CharField("Grupo", max_length=50, null=True, blank=True)
-    city = models.CharField("Cidade", max_length=50, null=True, blank=True)
-    state = models.CharField("Estado", max_length=50, null=True, blank=True)
-    def __unicode__(self):
-        return u'%s' % (self.name)
-
 FIELD_TYPE_CHOICES = (
     (1, 'Texto'),
     (2, 'Inteiro'),
@@ -22,9 +12,25 @@ FIELD_TYPE_CHOICES = (
     (4, 'Lista'),
 )
 
+TIME_UNIT_CHOICES = (
+    (1, 'Dia(s)'),
+    (30, 'Mês(s)'),
+    (365, 'Ano(s)'),
+)
+
+class DocumentType(models.Model):
+    name = models.CharField("Tipo de documento", max_length=50, unique=True)
+    validityPeriod = models.IntegerField("Validade em meses")
+    description = models.CharField("Descrição", max_length=300, null=True, blank=True)
+    group = models.CharField("Grupo", max_length=50, null=True, blank=True)
+    city = models.CharField("Cidade", max_length=50, null=True, blank=True)
+    state = models.CharField("Estado", max_length=50, null=True, blank=True)
+    def __unicode__(self):
+        return u'%s' % (self.name)
+
 class DocumentTypeField(models.Model):
     documentType = models.ForeignKey(DocumentType, verbose_name="Tipo de documento")
-    name = models.CharField("Campo", max_length=50, unique=True)
+    name = models.CharField("Campo", max_length=50)
     fieldType = models.IntegerField("Tipo do campo",
                                       choices=FIELD_TYPE_CHOICES,
                                       default=1)
@@ -36,8 +42,12 @@ class DocumentTypeField(models.Model):
 class DocumentStatus(models.Model):
     name = models.CharField("Status", max_length=50, unique=True)
     enabled = models.BooleanField("Ativo")
-    minimumValidity = models.IntegerField("Validade mínima", null=True, blank=True)
     colorCode = models.CharField("Color", max_length=7, default="#FFFFFF")
+    minimumTime = models.IntegerField("Validade", default=0)
+    minimumTimeUnit = models.IntegerField("Unidade de Tempo",
+                                      choices=TIME_UNIT_CHOICES,
+                                      default=1)
+    glyphicon = models.CharField("Glyphicon", max_length=30, null=True, blank=True, default="glyphicon-star")
     def __unicode__(self):
         return u'%s' % (self.name)
 
@@ -54,7 +64,7 @@ class Document(models.Model):
 
 class DocumentHistory(models.Model):
     document = models.ForeignKey(Document, verbose_name="Documento")
-    user = models.OneToOneField(User, on_delete=models.PROTECT, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     eventDate = models.DateTimeField(auto_now=True)
     operation = models.CharField("Operação", max_length=50)
     snapshot = models.CharField("Resumo dos dados", max_length=1000)

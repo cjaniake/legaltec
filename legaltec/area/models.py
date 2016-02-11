@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
-class AreaStatus(models.Model):
-    name = models.CharField("Status", max_length=50, unique=True)
-    enabled = models.BooleanField("Ativo")
-    minimumValidity = models.IntegerField("Validade mínima", null=True, blank=True)
-    colorCode = models.CharField("Color", max_length=7, default="#FFFFFF")
-    def __unicode__(self):
-        return u'%s' % (self.name)
-
 class Area(models.Model):
     name = models.CharField("Área", max_length=50, unique=True)
-    areaStatus = models.ForeignKey(AreaStatus, verbose_name="Status")
+    enabled = models.BooleanField("Ativo", default=True)
     adminEmail = models.EmailField("Email administrador")
+    validUntil = models.DateField("Validade licença", null=True, blank=True)
+    applyPermissions = models.BooleanField("Exigir permissões específicas", default=False)
     def __unicode__(self):
         return u'%s' % (self.name)
 

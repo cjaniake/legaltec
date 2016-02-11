@@ -7,81 +7,10 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
-from area.forms import AreaForm, EstablishmentForm, AreaStatusForm
-from area.models import Area, Establishment, AreaStatus
+from area.forms import AreaForm, EstablishmentForm
+from area.models import Area, Establishment
 from doc.models import Document
 from legaltec.utils import to_JSON
-
-
-class AreaStatusWrapper:
-    def __init__(self, areastatus):
-        self.areastatus = areastatus
-    def name(self, **kwargs):
-        return self.areastatus.name
-    def id(self, **kwargs):
-        return self.areastatus.id
-    content = 'content about area status'
-    link = '/areastatus/'
-
-class ListAreaStatusView(TemplateView):
-    template_name = "list_template.html"
-    def get_context_data(self, **kwargs):
-        context = super(ListAreaStatusView, self).get_context_data(**kwargs)
-        #context['object_list'] = list(AreaStatus.objects.all())
-        context['object_list'] = map(lambda s: AreaStatusWrapper(s), AreaStatus.objects.all())
-        new = AreaStatus()
-        new.name = "<novo>"
-        context['object_list'].append(AreaStatusWrapper(new))
-        return context
-
-def handle_areastatus(request):
-    if request.method == 'POST':
-
-        form = AreaStatusForm(request.POST)
-
-        if form.is_valid():
-            a = AreaStatus()
-            a.name = form.cleaned_data['name']
-            a.enabled = form.cleaned_data['enabled']
-            a.minimumValidity = form.cleaned_data['minimumValidity']
-            a.colorCode = form.cleaned_data['colorCode']
-
-            a.save()
-
-            return HttpResponseRedirect('/areastatus/')
-
-    else:
-        form = AreaStatusForm()
-    return render(request, 'detail_template.html', {'form': form, 'action':'/areastatus/', 'http_method':'POST'})
-
-# GET/POST /area/<areastatuscode>
-def edit_areastatus(request, areastatuscode=None):
-    if(areastatuscode):
-        a = AreaStatus.objects.get(id=int(areastatuscode))
-
-        if request.method == 'POST':
-            #update record with submitted values
-
-            form = AreaStatusForm(request.POST, instance=a)
-
-            if form.is_valid():
-                a.name = form.cleaned_data['name']
-                a.enabled = form.cleaned_data['enabled']
-                a.minimumValidity = form.cleaned_data['minimumValidity']
-                a.colorCode = form.cleaned_data['colorCode']
-
-                a.save()
-
-                return HttpResponseRedirect('/areastatuss/')
-
-            return render(request, 'detail_template.html', {'form': form, 'action':'/areastatus/' + areastatuscode + '/', 'http_method':'POST'})
-        else:
-            #load record to allow edition
-
-            form = AreaStatusForm(instance=a)
-            return render(request, 'detail_template.html', {'form': form, 'action':'/areastatus/' + areastatuscode + '/', 'http_method':'POST'})
-    else:
-        return HttpResponseRedirect('/areastatus/')
 
 class AreaWrapper:
     def __init__(self, area):
@@ -128,8 +57,10 @@ def handle_area(request):
         if form.is_valid():
             a = Area()
             a.name = form.cleaned_data['name']
-            a.areaStatus = form.cleaned_data['areaStatus']
+            a.enabled = form.cleaned_data['enabled']
             a.adminEmail = form.cleaned_data['adminEmail']
+            a.validUntil = form.cleaned_data['validUntil']
+            a.applyPermissions = form.cleaned_data['applyPermissions']
 
             a.save()
 
@@ -151,8 +82,10 @@ def edit_area(request, areacode=None):
 
             if form.is_valid():
                 a.name = form.cleaned_data['name']
-                a.areaStatus = form.cleaned_data['areaStatus']
+                a.enabled = form.cleaned_data['enabled']
                 a.adminEmail = form.cleaned_data['adminEmail']
+                a.validUntil = form.cleaned_data['validUntil']
+                a.applyPermissions = form.cleaned_data['applyPermissions']
 
                 a.save()
 
@@ -178,7 +111,7 @@ class EstablishmentWrapper:
         qset = Document.objects.filter(establishment__id=self.estab.id, documentStatus__enabled=True)
         return qset.order_by('expirationDate')[:6]
     def link(self, **kwargs):
-        return '/area/' + str(self.estab.area.id) + '/establishment/' + str(self.estab.id)
+        return '/area/' + str(self.estab.area.id) + '/establishment/'
     def linkentrar(self, **kwargs):
         return '/documents?establishmentId=' + str(self.estab.id)
     def dataseries(self, **kwargs):
@@ -188,7 +121,7 @@ class EstablishmentWrapper:
 
 # GET /area/<areacode>/establishments
 class ListEstablishmentView(TemplateView):
-    template_name = "area/stablishment_list_template.html"
+    template_name = "area/establishment_list_template.html"
     def get_context_data(self, **kwargs):
         areacode = kwargs['areacode']
         context = super(ListEstablishmentView, self).get_context_data(**kwargs)

@@ -9,7 +9,7 @@
 			<div class="col-md-6"><strong>Status do documento:</strong> {{ document.documentStatus.name }}</div>
 			<div class="col-md-6"><strong>Data de Emissão:</strong> {{ document.expeditionDate }}</div>
 			<div class="col-md-6"><strong>Data de Expiração:</strong> {{ document.expirationDate }}</div>
-			<div class="col-md-6"><strong>Data de Criação:</strong> {{ document.creationDate }}</div>
+			<div class="col-md-6"><strong>Data de Criação:</strong> {{ document.createdDate }}</div>
 			<div class="col-md-6"><strong>Última Alteração:</strong> {{ document.modifiedDate }}</div>
 		</div>
 	</div>
@@ -31,7 +31,7 @@
 						<td>{{ object.uploadDate }}</td>
 						<td>
 							<div class="btn-group btn-group-sm" role="group" aria-label="...">
-								<a class="btn btn-default" href="{{ object.documentFile.url }}">Download</a>
+								<a class="btn btn-default" href="{{ object.documentFile.url }}" download>Download</a>
 								<a class="btn btn-primary" href="{{ object.documentFile.url }}">Ver</a>
 							</div>
 						</td>
@@ -67,8 +67,8 @@
 						<td>{{ object.uploadDate }}</td>
 						<td>
 							<div class="btn-group btn-group-sm" role="group" aria-label="...">
-								<a class="btn btn-default" href="/upload/{{ document.href }}">Download</a>
-								<a class="btn btn-primary" href="/upload/{{ document.href }}">Ver</a>
+								<a class="btn btn-default" href="{{ object.imageFile.url }}" download>Download</a>
+								<a class="btn btn-primary" href="{{ object.imageFile.url }}">Ver</a>
 							</div>
 						</td>
 					</tr>

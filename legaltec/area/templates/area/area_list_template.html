@@ -13,7 +13,9 @@
 						<script>
 							var data = [
 								{% for dataseries in object.dataseries %}
-								{ value: {{ dataseries.value }}, color:"{{ dataseries.color }}", label: "{{ dataseries.label }}" },
+								{ value: {{ dataseries.value }}, color:"{{ dataseries.color }}",
+								  label: "{{ dataseries.label }}", labelColor : 'black',
+                    			  labelFontSize : '16' },
 								{% endfor %}
 							]
 							// Get the context of the canvas element we want to select
@@ -33,7 +35,7 @@
 								{% endfor %}
 							<p>
 								{% if object.id %}
-									<a class="btn btn-primary" href="{{ object.linkentrar }}">Entrar</a> <a class="btn" href="{{ object.link }}">Alterar</a>
+									<a class="btn btn-primary" href="{{ object.linkentrar }}">Entrar</a> <a class="btn" href="{{ object.link }}{{ object.id }}">Alterar</a>
 								{% else %}
 									<a class="btn btn-primary" href="{{ object.link }}">Incluir</a>
 								{% endif %}

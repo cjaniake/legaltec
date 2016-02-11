@@ -1,16 +1,20 @@
-from django.forms import ModelForm, Form, FileField, Field, ImageField
+from django.forms import ModelForm, Form, FileField, Field, ImageField, TextInput, BooleanField
 from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document
 
 
 class DocumentStatusForm(ModelForm):
     class Meta:
         model = DocumentStatus
-        fields = ['name','minimumValidity','enabled','colorCode']
+        fields = ['name','minimumTime','minimumTimeUnit','enabled','colorCode','glyphicon']
 
 class DocumentTypeForm(ModelForm):
     class Meta:
         model = DocumentType
         fields = ['name','validityPeriod','description','group','city','state']
+        widgets = {
+            'name': TextInput(attrs={'size': 50}),
+            'description': TextInput(attrs={'size': 50}),
+        }
 
 class DocumentTypeFieldForm(ModelForm):
     class Meta:
@@ -18,20 +22,10 @@ class DocumentTypeFieldForm(ModelForm):
         fields = ['name','fieldType','help','fieldChoices']
 
 class DocumentForm(ModelForm):
+    enabled = BooleanField(required=False, label="Ativo")
     class Meta:
         model = Document
-        fields = ['establishment','documentType','documentStatus','expeditionDate','expirationDate']
-
-class DocumentDetailForm(ModelForm):
-    class Meta:
-        model = Document
-        fields = '__all__'
-    def __init__(self, *args, **kwargs):
-        super(DocumentDetailForm, self).__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs['readonly'] = True
-            field.widget.attrs['disabled'] = True
-
+        fields = ['establishment','documentType','expeditionDate','expirationDate']
 
 class DocumentFileUploadForm(Form):
     file = FileField(label='Arquivo')

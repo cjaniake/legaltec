@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, date
+from time import timezone
+
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.serializers import json
@@ -8,21 +11,23 @@ from django.views.generic import TemplateView
 
 from area.models import Establishment, Area
 from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document, DocumentHistory, DocumentFile, \
-    DocumentImageFile
-from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentForm, DocumentDetailForm, \
-    DocumentImageFileUploadForm, DocumentFileUploadForm
+    DocumentImageFile, TIME_UNIT_CHOICES
+from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentForm, DocumentImageFileUploadForm, DocumentFileUploadForm
 from legaltec.utils import to_JSON
 
 
 class DocumentStatusWrapper:
     def __init__(self, documentstatus):
         self.documentstatus = documentstatus
+        self.timeunitdict = dict(TIME_UNIT_CHOICES)
     def name(self, **kwargs):
         return self.documentstatus.name
     def id(self, **kwargs):
         return self.documentstatus.id
-    content = 'content about document status'
+    def content(self):
+        return '{} {}'.format(self.documentstatus.minimumTime, self.timeunitdict[self.documentstatus.minimumTimeUnit])
     link = '/documentstatus/'
+    glyphicon = 'glyphicon-list-alt'
 
 class ListDocumentStatusView(TemplateView):
     template_name = "list_template.html"
@@ -44,9 +49,10 @@ def handle_documentstatus(request):
             a = DocumentStatus()
             a.name = form.cleaned_data['name']
             a.enabled = form.cleaned_data['enabled']
-            a.minimumValidity = form.cleaned_data['minimumValidity']
+            a.minimumTime = form.cleaned_data['minimumTime']
+            a.minimumTimeUnit = form.cleaned_data['minimumTimeUnit']
             a.colorCode = form.cleaned_data['colorCode']
-
+            a.glyphicon = form.cleaned_data['glyphicon']
             a.save()
 
             return HttpResponseRedirect('/documentstatuss/')
@@ -68,9 +74,10 @@ def edit_documentstatus(request, docstatuscode=None):
             if form.is_valid():
                 a.name = form.cleaned_data['name']
                 a.enabled = form.cleaned_data['enabled']
-                a.minimumValidity = form.cleaned_data['minimumValidity']
+                a.minimumTime = form.cleaned_data['minimumTime']
+                a.minimumTimeUnit = form.cleaned_data['minimumTimeUnit']
                 a.colorCode = form.cleaned_data['colorCode']
-
+                a.glyphicon = form.cleaned_data['glyphicon']
                 a.save()
 
                 return HttpResponseRedirect('/documentstatuss/')
@@ -91,8 +98,10 @@ class DocumentTypeWrapper:
         return self.documenttype.name
     def id(self, **kwargs):
         return self.documenttype.id
-    content = 'content about document type'
+    def content(self):
+        return self.documenttype.description
     link = '/documenttype/'
+    glyphicon = 'glyphicon-book'
 
 class ListDocumentTypeView(TemplateView):
     template_name = "doc/doctype_list_template.html"
@@ -242,6 +251,13 @@ class DocumentWrapper:
 
 class ListDocumentView(TemplateView):
     template_name = "doc/doctable_template.html"
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect('/areas')
+        areacode = request.session.get('areacode')
+        if not areacode:
+            return HttpResponseRedirect('/areas')
+        return super(ListDocumentView, self).dispatch(request, *args, **kwargs)
     def documentAsList(self, document):
         return [document.establishment.name, document.documentType.name, document.documentStatus.name, document.expirationDate]
     def get_context_data(self, **kwargs):
@@ -315,7 +331,7 @@ class ListDocumentView(TemplateView):
         self.request.session['selection_list'] = selectionList
         context['area'] = area
         context['selected'] = selected
-        context['tableheader_list'] = ['Estabelecimento', 'Tipo de Documento', 'Status', 'Data de Expiração']
+        context['tableheader_list'] = ['Estabelecimento','Tipo de Documento','Data de Expiração']
         context['object_list'] = map(lambda s: s, qset.all())
         context['area_choices'] = map(lambda s: s.name, Area.objects.all())
         context['establishment_choices'] = map(lambda s: { 'name' : s.name, 'id' : s.id }, area.establishment_set.all()) if area else []
@@ -340,10 +356,12 @@ def handle_document(request):
             a = Document()
             a.establishment = form.cleaned_data['establishment']
             a.documentType = form.cleaned_data['documentType']
-            a.documentStatus = form.cleaned_data['documentStatus']
             a.expeditionDate = form.cleaned_data['expeditionDate']
             a.expirationDate = form.cleaned_data['expirationDate']
-
+            if form.cleaned_data['enabled']:
+                a.documentStatus = statusForExpirationDate(form.cleaned_data['expirationDate'])
+            else:
+                a.documentStatus = DocumentStatus.objects.filter(enabled=False)[0]
             a.save()
 
             h = DocumentHistory()
@@ -367,13 +385,14 @@ def handle_document(request):
                 t = obj.object
         st = None
         form = DocumentForm(initial={'establishment': e,'documentType': t })
+        form.fields['enabled'].initial = True
 
     return render(request, 'detail_template.html', {'form': form, 'action':'/document/', 'http_method':'POST', 'area' : area})
 
 # GET/POST /document/<documentcode>
 @login_required
 def edit_document(request, documentcode=None):
-    if(documentcode):
+    if documentcode:
         a = Document.objects.get(id=int(documentcode))
 
         if request.method == 'POST':
@@ -384,9 +403,12 @@ def edit_document(request, documentcode=None):
             if form.is_valid():
                 a.establishment = form.cleaned_data['establishment']
                 a.documentType = form.cleaned_data['documentType']
-                a.documentStatus = form.cleaned_data['documentStatus']
                 a.expeditionDate = form.cleaned_data['expeditionDate']
                 a.expirationDate = form.cleaned_data['expirationDate']
+                if form.cleaned_data['enabled']:
+                    a.documentStatus = statusForExpirationDate(form.cleaned_data['expirationDate'])
+                else:
+                    a.documentStatus = DocumentStatus.objects.filter(enabled=False)[0]
 
                 a.save()
 
@@ -404,6 +426,7 @@ def edit_document(request, documentcode=None):
             #load record to allow edition
 
             form = DocumentForm(instance=a)
+            form.fields['enabled'].initial = a.documentStatus.enabled
             return render(request, 'detail_template.html', {'form': form, 'action':'/document/' + documentcode + '/', 'http_method':'POST'})
     else:
         return HttpResponseRedirect('/document/')
@@ -416,7 +439,6 @@ class ListDocumentFileView(TemplateView):
         documentcode = kwargs['documentcode']
         document = Document.objects.get(id=int(documentcode))
         context['document'] = document
-        context['form'] = DocumentDetailForm(instance=document)
         context['file_list'] = DocumentFile.objects.filter(document__id=document.id).all()
         context['imagefile_list'] = DocumentImageFile.objects.filter(document__id=document.id).all()
         context['file_upload_form'] = DocumentFileUploadForm()
@@ -478,7 +500,39 @@ class ListDocumentHistoryView(TemplateView):
         documentcode = kwargs['documentcode']
         document = Document.objects.get(id=int(documentcode))
         context['document'] = document
-        context['form'] = DocumentDetailForm(instance=document)
         context['event_list'] = DocumentHistory.objects.filter(document__id=document.id).all()
         context['area'] = document.establishment.area
         return context
+
+def update_document_status(request):
+    inner_qs = DocumentStatus.objects.filter(enabled=True)
+    qset = Document.objects.filter(documentStatus__in=inner_qs)
+    map(verifyStatusChange, qset.all())
+    return HttpResponseRedirect('/documents/')
+
+def verifyStatusChange(doc):
+    status = statusForExpirationDate(doc.expirationDate)
+    if status == doc.documentStatus:
+        print("document {} ok".format(doc.id))
+    else:
+        print("document {} changed".format(doc.id))
+        doc.documentStatus = status
+        doc.save()
+
+        h = DocumentHistory()
+        h.operation = "STATUS CHANGED"
+        h.snapshot = to_JSON(doc)
+
+        doc.documenthistory_set.add(h)
+
+
+def statusForExpirationDate(expirationDate):
+    qs = DocumentStatus.objects.filter(enabled=True)
+    d = {s.minimumTime * s.minimumTimeUnit: s for s in qs.all()}
+    delta = expirationDate - date.today()
+    s = None
+    for days in sorted(d):
+        if days < delta.days or not s:
+            s = d[days]
+    return s
+

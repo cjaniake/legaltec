@@ -24,9 +24,10 @@
 					</tr>
 					{% for object in object_list %}
 					<tr>
-						<td>{{ object.establishment.name }}</td>
+						<td><span class="glyphicon {{ object.documentStatus.glyphicon }}" aria-hidden="true"
+						style="color:{{ object.documentStatus.colorCode }}"></span>
+							{{ object.establishment.name }}</td>
 						<td>{{ object.documentType.name }}</td>
-						<td>{{ object.documentStatus.name}}</td>
 						<td>{{ object.expirationDate}}</td>
 						<td>{{ object.expirationDate|timeuntil}}</td>
 						<td>
