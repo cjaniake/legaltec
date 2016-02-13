@@ -49,26 +49,19 @@
 						<a href="#">Ajuda</a>
 					</li>
 					<li class="dropdown">
-						{% if not request.user.is_authenticated %}<a href="{% url django.contrib.auth.login %}">Login</a>
+						{% if not request.user.is_authenticated %}<a href="/accounts/login">Login</a>
 						{% else %}
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ request.user.username }}<strong class="caret"></strong></a>
 						<ul class="dropdown-menu">
-							<li>
-								<a href="/documenttypes">Tipos de Documento</a>
-							</li>
-							<li>
-								<a href="#">Eventos</a>
-							</li>
-							<li>
-								<a href="#">Preferências</a>
-							</li>
-							<li class="divider">
-							</li>
 							<li>
 								<a href="#">Usuário</a>
 							</li>
 							<li>
 								<a href="#">Segurança</a>
+							</li>
+							<li class="divider">
+							<li>
+								<a href="/accounts/logout/">Sair</a>
 							</li>
 						</ul>
 						{% endif %}

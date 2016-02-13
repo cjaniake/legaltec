@@ -4,6 +4,7 @@ from time import timezone
 
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
+from django.core.exceptions import ValidationError
 from django.core.serializers import json
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -40,10 +41,14 @@ class ListDocumentStatusView(TemplateView):
         context['object_list'].append(DocumentStatusWrapper(new))
         return context
 
+@login_required
 def handle_documentstatus(request):
     if request.method == 'POST':
 
         form = DocumentStatusForm(request.POST)
+
+        if not request.user.is_superuser and not request.user.has_perm('doc.add_documentstatus'):
+            form.add_error(None, ValidationError('User has no permission'))
 
         if form.is_valid():
             a = DocumentStatus()
@@ -62,6 +67,7 @@ def handle_documentstatus(request):
     return render(request, 'detail_template.html', {'form': form, 'action':'/documentstatus/', 'http_method':'POST'})
 
 # GET/POST /area/<docstatuscode>
+@login_required
 def edit_documentstatus(request, docstatuscode=None):
     if(docstatuscode):
         a = DocumentStatus.objects.get(id=int(docstatuscode))
@@ -70,6 +76,9 @@ def edit_documentstatus(request, docstatuscode=None):
             #update record with submitted values
 
             form = DocumentStatusForm(request.POST, instance=a)
+
+            if not request.user.is_superuser and not request.user.has_perm('doc.change_documentstatus'):
+                 form.add_error(None, ValidationError('User has no permission'))
 
             if form.is_valid():
                 a.name = form.cleaned_data['name']
@@ -113,10 +122,14 @@ class ListDocumentTypeView(TemplateView):
         context['object_list'].append(DocumentTypeWrapper(new))
         return context
 
+@login_required
 def handle_documenttype(request):
     if request.method == 'POST':
 
         form = DocumentTypeForm(request.POST)
+
+        if not request.user.is_superuser and not request.user.has_perm('doc.add_documenttype'):
+            form.add_error(None, ValidationError('User has no permission'))
 
         if form.is_valid():
             a = DocumentType()
@@ -136,6 +149,7 @@ def handle_documenttype(request):
     return render(request, 'detail_template.html', {'form': form, 'action':'/documenttype/', 'http_method':'POST'})
 
 # GET/POST /area/<doctypecode>
+@login_required
 def edit_documenttype(request, doctypecode=None):
     if(doctypecode):
         a = DocumentType.objects.get(id=int(doctypecode))
@@ -144,6 +158,9 @@ def edit_documenttype(request, doctypecode=None):
             #update record with submitted values
 
             form = DocumentTypeForm(request.POST, instance=a)
+
+            if not request.user.is_superuser and not request.user.has_perm('doc.change_documenttype'):
+                form.add_error(None, ValidationError('User has no permission'))
 
             if form.is_valid():
                 a.name = form.cleaned_data['name']
@@ -192,6 +209,7 @@ class ListDocumentTypeFieldView(TemplateView):
         context['object_list'].append(DocumentTypeFieldWrapper(new, doctype))
         return context
 
+@login_required
 def handle_documenttypefield(request, doctypecode=None):
     doctype = DocumentType.objects.get(id=int(doctypecode))
     if request.method == 'POST':
@@ -212,6 +230,7 @@ def handle_documenttypefield(request, doctypecode=None):
     return render(request, 'detail_template.html', {'form': form, 'action':'/documenttype/' + str(doctype.id) + '/field/', 'http_method':'POST'})
 
 # GET/POST /area/<doctypefieldcode>
+@login_required
 def edit_documenttypefield(request, doctypecode=None, doctypefieldcode=None):
     doctype = DocumentType.objects.get(id=int(doctypecode))
     if(doctypecode and doctypefieldcode):
