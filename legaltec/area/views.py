@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 
 from area.forms import AreaForm, EstablishmentForm
 from area.models import Area, Establishment
-from doc.models import Document
+from doc.models import Document, DocumentStatus
 from legaltec.utils import to_JSON
 
 class AreaWrapper:
@@ -22,16 +22,18 @@ class AreaWrapper:
     def content(self, **kargs):
         inner_qs = Establishment.objects.filter(area__id__exact=self.area.id)
         qset = Document.objects.filter(establishment__in=inner_qs, documentStatus__enabled=True)
-        return qset.order_by('expirationDate')[:6]
+        return qset.order_by('expirationDate')[:2]
     def link(self, **kwargs):
         return '/area/' + str(self.area.id)
     def linkentrar(self, **kwargs):
         return '/area/' + str(self.area.id) + '/establishments'
     def dataseries(self, **kwargs):
         inner_qs = Establishment.objects.filter(area__id__exact=self.area.id)
-        qset = Document.objects.filter(establishment__in=inner_qs, documentStatus__enabled=True)
-        qset = qset.annotate(num_docs=Count('documentStatus'))
-        return map(lambda d: {'value':d.num_docs, 'label':d.documentStatus.name, 'color':d.documentStatus.colorCode}, qset)
+        qset = DocumentStatus.objects\
+            .filter(document__establishment__in=inner_qs)\
+            .filter(document__documentStatus__enabled=True)\
+            .annotate(num_docs=Count('document'))
+        return map(lambda d: {'value':d.num_docs, 'label':d.name, 'color':d.colorCode}, qset)
 
 
 class ListAreaView(TemplateView):
@@ -84,7 +86,7 @@ def edit_area(request, areacode=None):
                 a.name = form.cleaned_data['name']
                 a.enabled = form.cleaned_data['enabled']
                 a.adminEmail = form.cleaned_data['adminEmail']
-                a.validUntil = form.cleaned_data['validUntil']
+                a.validUntil = form.cleaned_data[+'validUntil']
                 a.applyPermissions = form.cleaned_data['applyPermissions']
 
                 a.save()
@@ -109,15 +111,17 @@ class EstablishmentWrapper:
         return self.estab.id
     def content(self, **kargs):
         qset = Document.objects.filter(establishment__id=self.estab.id, documentStatus__enabled=True)
-        return qset.order_by('expirationDate')[:6]
+        return qset.order_by('expirationDate')[:2]
     def link(self, **kwargs):
         return '/area/' + str(self.estab.area.id) + '/establishment/'
     def linkentrar(self, **kwargs):
         return '/documents?establishmentId=' + str(self.estab.id)
     def dataseries(self, **kwargs):
-        qset = Document.objects.filter(establishment__id=self.estab.id, documentStatus__enabled=True)
-        qset = qset.annotate(num_docs=Count('documentStatus'))
-        return map(lambda d: {'value':d.num_docs, 'label':d.documentStatus.name, 'color':d.documentStatus.colorCode}, qset)
+        qset = DocumentStatus.objects\
+            .filter(document__establishment__exact=self.estab.id)\
+            .filter(document__documentStatus__enabled=True)\
+            .annotate(num_docs=Count('document'))
+        return map(lambda d: {'value':d.num_docs, 'label':d.name, 'color':d.colorCode}, qset)
 
 # GET /area/<areacode>/establishments
 class ListEstablishmentView(TemplateView):
