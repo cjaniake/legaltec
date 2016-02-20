@@ -97,15 +97,15 @@
 
 		{% block breadcrumb %}
 		<div class="row">
-		<ol class="breadcrumb">
-			<li><a href="/areas"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
-			{% if area %}
-			<li><a href="/area/{{ area.id }}/establishments">{{ area.name }}</a></li>
-			{% endif %}
-			{% if area and establishment %}
-			<li><a href="/area/{{ area.id }}/establishment/{{ establishment.id }}/documents">{{ location.name }}</a></li>
-			{% endif %}
-		</ol>
+			<ol class="breadcrumb">
+				<li><a href="/areas"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
+				{% if area %}
+				<li><a href="/area/{{ area.id }}/establishments">{{ area.name }}</a></li>
+				{% endif %}
+				{% if area and establishment %}
+				<li><a href="/area/{{ area.id }}/establishment/{{ establishment.id }}/documents">{{ location.name }}</a></li>
+				{% endif %}
+			</ol>
 		</div>
 		{% endblock %}
 

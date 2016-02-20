@@ -37,7 +37,7 @@ class AreaWrapper:
 
 
 class ListAreaView(TemplateView):
-    template_name = "area/area_list_template.html"
+    template_name = "area/area_objlist_small.html"
     def get_context_data(self, **kwargs):
         context = super(ListAreaView, self).get_context_data(**kwargs)
         #context['object_list'] = list(Area.objects.all())
@@ -45,10 +45,23 @@ class ListAreaView(TemplateView):
         new = Area()
         new.name = "<nova>"
         context['object_list'].append(AreaWrapper(new))
+
+        # clean session information
         if 'areacode' in self.request.session:
             del self.request.session['areacode']
         if 'selection_list' in self.request.session:
             del self.request.session['selection_list']
+
+        # select template to be presented
+        presentation = self.request.GET['p'] if 'p' in self.request.GET else 'small'
+        print (presentation)
+        if presentation == 'large':
+            self.template_name = "area/area_objlist_large.html"
+        elif presentation == 'list':
+            self.template_name = "area/area_objlist_list.html"
+        else:
+            self.template_name = "area/area_objlist_small.html"
+
         return context
 
 def handle_area(request):

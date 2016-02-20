@@ -1,0 +1,28 @@
+{% extends "area/area_list_template.html" %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-md-12">
+			<div class="row">
+				{% for object in object_list %}
+				<div class="col-md-2">
+					<div class="thumbnail">
+						<div class="caption">
+							<h3>
+								{{ object.name }}
+							</h3>
+							<p>
+								{% if object.id %}
+									<a class="btn btn-primary" href="{{ object.linkentrar }}">Entrar</a> <a class="btn" href="{{ object.link }}{{ object.id }}">Alterar</a>
+								{% else %}
+									<a class="btn btn-primary" href="{{ object.link }}">Incluir</a>
+								{% endif %}
+							</p>
+						</div>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -7,7 +7,7 @@
 				{% for object in object_list %}
 				<div class="col-md-4">
 					<div class="thumbnail">
-						<canvas id="chart_{{ object.id }}" width="240" height="240"></canvas>
+						<canvas id="chart_{{ object.id }}" width="240" height="240" class="center-block"></canvas>
 						<script>
 							var data = [
 								{% for dataseries in object.dataseries %}
@@ -26,13 +26,14 @@
 							</h3>
 								{% for doc in object.content %}
 								<p>
+									{{ doc.establishment.name }}<br />
 									<strong>{{ doc.documentType.name }}</strong><br />
 									{{ doc.expirationDate }} - {{ doc.expirationDate|timeuntil}}
 								</p>
 								{% endfor %}
 							<p>
 								{% if object.id %}
-									<a class="btn btn-primary" href="{{ object.linkentrar }}">Entrar</a> <a class="btn" href="{{ object.link }}">Alterar</a>
+									<a class="btn btn-primary" href="{{ object.linkentrar }}">Entrar</a> <a class="btn" href="{{ object.link }}{{ object.id }}">Alterar</a>
 								{% else %}
 									<a class="btn btn-primary" href="{{ object.link }}">Incluir</a>
 								{% endif %}

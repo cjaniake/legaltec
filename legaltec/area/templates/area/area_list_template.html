@@ -1,50 +1,16 @@
 {% extends "generic_template.html" %}
 
-{% block content %}
+	{% block breadcrumb %}
+ 	{{ block.super }}
     <script src="/static/js/Chart.min.js"></script>
     <script src="/static/js/jquery.min.js"></script>
-	<div class="row">
+	<div class="row pull-right">
 		<div class="col-md-12">
-			<div class="row">
-				{% for object in object_list %}
-				<div class="col-md-4">
-					<div class="thumbnail">
-						<canvas id="chart_{{ object.id }}" width="240" height="240"></canvas>
-						<script>
-							var data = [
-								{% for dataseries in object.dataseries %}
-								{ value: {{ dataseries.value }}, color:"{{ dataseries.color }}",
-								  label: "{{ dataseries.label }}", labelColor : 'black',
-                    			  labelFontSize : '16' },
-								{% endfor %}
-							]
-							// Get the context of the canvas element we want to select
-							var ctx = $("#chart_{{ object.id }}").get(0).getContext("2d");
-							var myDoughnutChart = new Chart(ctx).Doughnut(data,{ animateScale: true });
-						</script>
-						<div class="caption">
-							<h3>
-								{{ object.name }}
-							</h3>
-								{% for doc in object.content %}
-								<p>
-									{{ doc.establishment.name }}<br />
-									<strong>{{ doc.documentType.name }}</strong><br />
-									{{ doc.expirationDate }} - {{ doc.expirationDate|timeuntil}}
-								</p>
-								{% endfor %}
-							<p>
-								{% if object.id %}
-									<a class="btn btn-primary" href="{{ object.linkentrar }}">Entrar</a> <a class="btn" href="{{ object.link }}{{ object.id }}">Alterar</a>
-								{% else %}
-									<a class="btn btn-primary" href="{{ object.link }}">Incluir</a>
-								{% endif %}
-							</p>
-						</div>
-					</div>
-				</div>
-				{% endfor %}
-			</div>
+			<ul class="nav nav-pills">
+			  <li role="presentation" class="active"><a href="?p=small"><span class="glyphicon glyphicon-th" aria-hidden="true"></span></a></li>
+			  <li role="presentation" class="active"><a href="?p=large"><span class="glyphicon glyphicon-th-large" aria-hidden="true"></span></a></li>
+			  <li role="presentation" class="active"><a href="?p=list"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span></a></li>
+			</ul>
 		</div>
 	</div>
-{% endblock %}
+	{% endblock breadcrumb %}
