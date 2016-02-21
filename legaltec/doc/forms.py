@@ -1,4 +1,4 @@
-from django.forms import ModelForm, Form, FileField, Field, ImageField, TextInput, BooleanField
+from django.forms import ModelForm, Form, FileField, Field, TextInput, BooleanField
 from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document
 
 
@@ -31,4 +31,4 @@ class DocumentFileUploadForm(Form):
     file = FileField(label='Arquivo')
 
 class DocumentImageFileUploadForm(Form):
-    file = ImageField(label='Arquivo')
+    file = FileField(label='Arquivo')

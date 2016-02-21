@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
             name='DocumentImageFile',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('imageFile', models.ImageField(upload_to=b'uploads/%Y/%m/%d/')),
+                ('imageFile', models.FileField(upload_to=b'uploads/%Y/%m/%d/')),
                 ('uploadDate', models.DateTimeField(auto_now_add=True)),
                 ('checksum', models.CharField(max_length=20)),
             ],

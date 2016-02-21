@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
             name='DocumentImage',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('imageFile', models.ImageField(upload_to=b'uploads/%Y/%m/%d/')),
+                ('imageFile', models.FileField(upload_to=b'uploads/%Y/%m/%d/')),
                 ('documentFile', models.FileField(upload_to=b'uploads/%Y/%m/%d/')),
                 ('checksum', models.CharField(max_length=20)),
                 ('document', models.ForeignKey(verbose_name=b'Documento', to='doc.Document')),

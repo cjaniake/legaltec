@@ -71,7 +71,7 @@ class DocumentHistory(models.Model):
 
 class DocumentImageFile(models.Model):
     document = models.ForeignKey(Document, verbose_name="Documento")
-    imageFile = models.ImageField(upload_to='uploads/%Y/%m/%d/')
+    imageFile = models.FileField(upload_to='uploads/%Y/%m/%d/')
     enabled = models.BooleanField
     uploadDate = models.DateTimeField(auto_now_add=True)
     checksum = models.CharField(max_length=20)
