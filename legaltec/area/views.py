@@ -138,7 +138,7 @@ class EstablishmentWrapper:
 
 # GET /area/<areacode>/establishments
 class ListEstablishmentView(TemplateView):
-    template_name = "area/establishment_list_template.html"
+    template_name = "area/establishment_objlist_small.html"
     def get_context_data(self, **kwargs):
         areacode = kwargs['areacode']
         context = super(ListEstablishmentView, self).get_context_data(**kwargs)
@@ -151,6 +151,17 @@ class ListEstablishmentView(TemplateView):
         new.name = "<novo>"
         new.area = area
         context['object_list'].append(EstablishmentWrapper(new))
+
+        # select template to be presented
+        presentation = self.request.GET['p'] if 'p' in self.request.GET else 'small'
+        print (presentation)
+        if presentation == 'large':
+            self.template_name = "area/establishment_objlist_large.html"
+        elif presentation == 'list':
+            self.template_name = "area/establishment_objlist_list.html"
+        else:
+            self.template_name = "area/establishment_objlist_small.html"
+
         return context
 
 # GET/POST /area/<areacode>/establishment
