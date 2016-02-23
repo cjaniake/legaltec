@@ -221,6 +221,9 @@ def handle_documenttypefield(request, doctypecode=None):
             a.name = form.cleaned_data['name']
             a.fieldType = form.cleaned_data['fieldType']
             a.fieldChoices = form.cleaned_data['fieldChoices']
+            a.documenttype = doctype
+
+            a.save()
             doctype.documenttypefield_set.add(a)
 
             return HttpResponseRedirect('/documenttype/' + str(doctype.id) + '/fields/')
@@ -245,6 +248,9 @@ def edit_documenttypefield(request, doctypecode=None, doctypefieldcode=None):
                 a.name = form.cleaned_data['name']
                 a.fieldType = form.cleaned_data['fieldType']
                 a.fieldChoices = form.cleaned_data['fieldChoices']
+                a.documenttype = doctype
+
+                a.save()
                 doctype.documenttypefield_set.add(a)
 
                 return HttpResponseRedirect('/documenttype/' + str(doctype.id) + '/fields/')
@@ -387,7 +393,9 @@ def handle_document(request):
             h.user = request.user
             h.operation = "CREATION"
             h.snapshot = to_JSON(a)
+            h.document = a
 
+            h.save()
             a.documenthistory_set.add(h)
 
             return HttpResponseRedirect('/documents/')
@@ -435,7 +443,9 @@ def edit_document(request, documentcode=None):
                 h.user = request.user
                 h.operation = "MODIFICATION"
                 h.snapshot = to_JSON(a)
+                h.document = a
 
+                h.save()
                 a.documenthistory_set.add(h)
 
                 return HttpResponseRedirect('/documents/')
@@ -476,14 +486,18 @@ def handle_documentupload(request, documentcode):
         df.enabled = True
         df.checksum = 'TODO'
         df.size = str(form.cleaned_data['file'].size)
+        df.document = doc
 
+        df.save()
         doc.documentfile_set.add(df)
 
         h = DocumentHistory()
         h.user = request.user
         h.operation = "FILE UPLOAD " + df.documentFile.name
         h.snapshot = to_JSON(doc)
+        h.document = doc
 
+        h.save()
         doc.documenthistory_set.add(h)
 
     return HttpResponseRedirect('/document/' + documentcode + '/files/')
@@ -500,14 +514,18 @@ def handle_imageupload(request, documentcode):
         df.enabled = True
         df.checksum = 'TODO'
         df.size = str(form.cleaned_data['file'].size)
+        df.document = doc
 
+        df.save()
         doc.documentimagefile_set.add(df)
 
         h = DocumentHistory()
         h.user = request.user
         h.operation = "IMAGE UPLOAD " + df.imageFile.name
         h.snapshot = to_JSON(doc)
+        h.document = doc
 
+        h.save()
         doc.documenthistory_set.add(h)
 
     return HttpResponseRedirect('/document/' + documentcode + '/files/')
@@ -541,7 +559,9 @@ def verifyStatusChange(doc):
         h = DocumentHistory()
         h.operation = "STATUS CHANGED"
         h.snapshot = to_JSON(doc)
+        h.document = doc
 
+        h.save()
         doc.documenthistory_set.add(h)
 
 
