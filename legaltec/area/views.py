@@ -25,16 +25,16 @@ class AreaWrapper:
     def content(self, **kargs):
         return self.priorityDocs
     def link(self, **kwargs):
-        return '/area/' + str(self.area.id)
+        return '/area/' if self.area.id is None else '/area/' + str(self.area.id)
     def linkentrar(self, **kwargs):
         return '/area/' + str(self.area.id) + '/establishments'
     def icon(self, **kwargs):
-        if len(self.priorityDocs) > 0:
+        if self.priorityDocs and len(self.priorityDocs) > 0:
             return self.priorityDocs[0].documentStatus.glyphicon
         else :
             return 'glyphicon-ban-circle'
     def iconcolor(self, **kwargs):
-        if len(self.priorityDocs) > 0:
+        if self.priorityDocs and len(self.priorityDocs) > 0:
             return self.priorityDocs[0].documentStatus.colorCode
         else :
             return '#E6E6E6'
