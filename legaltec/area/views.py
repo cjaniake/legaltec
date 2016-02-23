@@ -29,12 +29,12 @@ class AreaWrapper:
     def linkentrar(self, **kwargs):
         return '/area/' + str(self.area.id) + '/establishments'
     def icon(self, **kwargs):
-        if self.priorityDocs:
+        if len(self.priorityDocs) > 0:
             return self.priorityDocs[0].documentStatus.glyphicon
         else :
             return 'glyphicon-ban-circle'
     def iconcolor(self, **kwargs):
-        if self.priorityDocs:
+        if len(self.priorityDocs) > 0:
             return self.priorityDocs[0].documentStatus.colorCode
         else :
             return '#E6E6E6'
