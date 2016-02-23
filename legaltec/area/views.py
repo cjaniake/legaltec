@@ -15,18 +15,29 @@ from legaltec.utils import to_JSON
 class AreaWrapper:
     def __init__(self, area):
         self.area = area
+        inner_qs = Establishment.objects.filter(area__id__exact=self.area.id)
+        qset = Document.objects.filter(establishment__in=inner_qs, documentStatus__enabled=True)
+        self.priorityDocs = qset.order_by('expirationDate')[:2]
     def name(self, **kwargs):
         return self.area.name
     def id(self, **kwargs):
         return self.area.id
     def content(self, **kargs):
-        inner_qs = Establishment.objects.filter(area__id__exact=self.area.id)
-        qset = Document.objects.filter(establishment__in=inner_qs, documentStatus__enabled=True)
-        return qset.order_by('expirationDate')[:2]
+        return self.priorityDocs
     def link(self, **kwargs):
         return '/area/' + str(self.area.id)
     def linkentrar(self, **kwargs):
         return '/area/' + str(self.area.id) + '/establishments'
+    def icon(self, **kwargs):
+        if self.priorityDocs:
+            return self.priorityDocs[0].documentStatus.glyphicon
+        else :
+            return 'glyphicon-ban-circle'
+    def iconcolor(self, **kwargs):
+        if self.priorityDocs:
+            return self.priorityDocs[0].documentStatus.colorCode
+        else :
+            return '#E6E6E6'
     def dataseries(self, **kwargs):
         inner_qs = Establishment.objects.filter(area__id__exact=self.area.id)
         qset = DocumentStatus.objects\
@@ -118,17 +129,28 @@ def edit_area(request, areacode=None):
 class EstablishmentWrapper:
     def __init__(self, estab):
         self.estab = estab
+        qset = Document.objects.filter(establishment__id=self.estab.id, documentStatus__enabled=True)
+        self.priorityDocs =  qset.order_by('expirationDate')[:2]
     def name(self, **kwargs):
         return self.estab.name
     def id(self, **kwargs):
         return self.estab.id
     def content(self, **kargs):
-        qset = Document.objects.filter(establishment__id=self.estab.id, documentStatus__enabled=True)
-        return qset.order_by('expirationDate')[:2]
+        return self.priorityDocs
     def link(self, **kwargs):
         return '/area/' + str(self.estab.area.id) + '/establishment/'
     def linkentrar(self, **kwargs):
         return '/documents?establishmentId=' + str(self.estab.id)
+    def icon(self, **kwargs):
+        if self.priorityDocs:
+            return self.priorityDocs[0].documentStatus.glyphicon
+        else :
+            return 'glyphicon-ban-circle'
+    def iconcolor(self, **kwargs):
+        if self.priorityDocs:
+            return self.priorityDocs[0].documentStatus.colorCode
+        else :
+            return '#E6E6E6'
     def dataseries(self, **kwargs):
         qset = DocumentStatus.objects\
             .filter(document__establishment__exact=self.estab.id)\
