@@ -110,7 +110,7 @@ def edit_area(request, areacode=None):
                 a.name = form.cleaned_data['name']
                 a.enabled = form.cleaned_data['enabled']
                 a.adminEmail = form.cleaned_data['adminEmail']
-                a.validUntil = form.cleaned_data[+'validUntil']
+                a.validUntil = form.cleaned_data['validUntil']
                 a.applyPermissions = form.cleaned_data['applyPermissions']
 
                 a.save()
