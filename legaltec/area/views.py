@@ -199,7 +199,6 @@ def handle_establishment(request, areacode=None):
             l.city = form.cleaned_data['city']
             l.state = form.cleaned_data['state']
             l.adminEmail = form.cleaned_data['adminEmail']
-            l.save()
 
             area.establishment_set.add(l)
 
