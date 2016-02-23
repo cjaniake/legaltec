@@ -87,7 +87,6 @@ def handle_area(request):
             a.adminEmail = form.cleaned_data['adminEmail']
             a.validUntil = form.cleaned_data['validUntil']
             a.applyPermissions = form.cleaned_data['applyPermissions']
-
             a.save()
 
             return HttpResponseRedirect('/areas/')
@@ -112,7 +111,6 @@ def edit_area(request, areacode=None):
                 a.adminEmail = form.cleaned_data['adminEmail']
                 a.validUntil = form.cleaned_data['validUntil']
                 a.applyPermissions = form.cleaned_data['applyPermissions']
-
                 a.save()
 
                 return HttpResponseRedirect('/areas/')
@@ -199,7 +197,9 @@ def handle_establishment(request, areacode=None):
             l.city = form.cleaned_data['city']
             l.state = form.cleaned_data['state']
             l.adminEmail = form.cleaned_data['adminEmail']
+            l.area = area
 
+            l.save()
             area.establishment_set.add(l)
 
             return HttpResponseRedirect('/area/' + areacode + '/establishments')
@@ -224,7 +224,6 @@ def edit_establishment(request, areacode=None, establishmentid=None):
                 l.city = form.cleaned_data['city']
                 l.state = form.cleaned_data['state']
                 l.adminEmail = form.cleaned_data['adminEmail']
-
                 l.save()
 
                 return HttpResponseRedirect('/area/' + areacode + '/establishments')
@@ -236,4 +235,3 @@ def edit_establishment(request, areacode=None, establishmentid=None):
             form = EstablishmentForm(instance=l)
             return render(request, 'detail_template.html', {'form': form, 'action':'/area/' + areacode + '/establishment/' + establishmentid + '/', 'http_method':'POST', 'area': area})
         return HttpResponseRedirect('/area/' + areacode + '/establishments') if areacode else HttpResponseRedirect('/areas/')
-
