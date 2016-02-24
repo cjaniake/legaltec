@@ -1,3 +1,4 @@
 .idea/
 legaltec/uploads/
-
+legaltec/db.sqlite3
+*.pyc
