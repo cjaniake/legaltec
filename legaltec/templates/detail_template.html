@@ -33,6 +33,7 @@
 	</div>
   	<script src="/static/js/jquery.colorPicker.min.js"></script>
 	<script src="/static/js/bootstrap-switch.js"></script>
+	<script src="/static/js/bootstrap-datepicker.js"></script>
 	<script>
 	  jQuery(document).ready(function($) {
 		$('#id_colorCode').colorPicker({colors: ["000000", "000033", "000066", "000099", "0000CC", "0000FF",
@@ -48,6 +49,8 @@
 		                                         "FFCC00", "FFCC33", "FFCC66", "FFCC99", "FFCCCC", "FFCCFF",
 		                                         "FFFF00", "FFFF33", "FFFF66", "FFFF99", "FFFFCC", "FFFFFF"]});
 		$(':checkbox').bootstrapSwitch();
+		$("input[name*='Date']").datepicker({format: 'yyyy-mm-dd'});
+		$("input[name='validUntil']").datepicker({format: 'yyyy-mm-dd'});
 	  });
   	</script>
 {% endblock %}
