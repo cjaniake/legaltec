@@ -277,7 +277,7 @@ class ListDocumentView(TemplateView):
     template_name = "doc/doctable_template.html"
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
-            return HttpResponseRedirect('/areas')
+            return HttpResponseRedirect('/admin/login/')
         areacode = request.session.get('areacode')
         if not areacode:
             return HttpResponseRedirect('/areas')

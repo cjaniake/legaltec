@@ -25,6 +25,7 @@ from legaltec import settings
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include('django.contrib.auth.urls')),
+    url(r'^accounts/profile/', areaviews.ListAreaView.as_view()),
     url(r'^areas/', areaviews.ListAreaView.as_view()),
     url(r'^area/$', areaviews.handle_area),
     url(r'^area/(?P<areacode>[0-9]+)/$', areaviews.edit_area),

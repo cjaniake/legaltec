@@ -10,6 +10,7 @@ from django.views.generic import TemplateView
 from area.forms import AreaForm, EstablishmentForm
 from area.models import Area, Establishment
 from doc.models import Document, DocumentStatus
+from customauth.models import CustomUser
 from legaltec.utils import to_JSON
 
 class AreaWrapper:
@@ -50,6 +51,13 @@ class AreaWrapper:
 
 class ListAreaView(TemplateView):
     template_name = "area/area_objlist_small.html"
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect('/accounts/login/')
+        c = CustomUser.objects.filter(user__id=request.user.id)
+        if(c and c[0].area):
+            return HttpResponseRedirect('/area/' + str(c[0].area.id) + '/establishments/')
+        return super(ListAreaView, self).dispatch(request, *args, **kwargs)
     def get_context_data(self, **kwargs):
         presentation = self.request.GET['p'] if 'p' in self.request.GET else 'small'
         context = super(ListAreaView, self).get_context_data(**kwargs)
