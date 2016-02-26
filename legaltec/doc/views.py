@@ -11,8 +11,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from area.models import Establishment, Area
-from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document, DocumentHistory, DocumentFile, \
-    DocumentImageFile, TIME_UNIT_CHOICES
+from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document, DocumentHistory, DocumentFile, DocumentImageFile, TIME_UNIT_CHOICES
 from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentForm, DocumentImageFileUploadForm, DocumentFileUploadForm
 from legaltec.utils import to_JSON
 
@@ -291,7 +290,8 @@ class ListDocumentView(TemplateView):
         selectionList = self.request.session.get('selection_list') # keep serialized version
         selected = {}                                              # keep object version
         if(not selectionList):
-           selectionList = {}
+            selectionList = {}
+
         areacode = self.request.session.get('areacode')
         if(areacode):
             area = Area.objects.get(id=int(areacode))
@@ -328,30 +328,26 @@ class ListDocumentView(TemplateView):
             else:
                 t = DocumentType.objects.get(id=documentTypeId)
                 selectionList['documentType'] = to_JSON(t)
-                qset = qset.filter(documentType=t)
         else:
             if 'documentType' in selectionList:
                 for obj in serializers.deserialize("json", selectionList['documentType']):
                     t = obj.object
         if(t):
             selected['documentType'] = t
+            qset = qset.filter(documentType=t)
 
-        st = None
-        documentStatusId = self.request.GET.get('documentStatusId')
-        if(documentStatusId):
-            if(documentStatusId=='None'):
-                if 'documentStatus' in selectionList:
-                    del selectionList['documentStatus']
+        activeStatusList = selectionList['activeStatusList'] \
+            if 'activeStatusList' in selectionList \
+            else list(DocumentStatus.objects.filter(enabled=True).values_list('id', flat=True))
+        toggleStatusId = self.request.GET.get('toggleDocumentStatusId')
+        if(toggleStatusId):
+            if(int(toggleStatusId) in activeStatusList):
+                activeStatusList.remove(int(toggleStatusId))
             else:
-                st = DocumentStatus.objects.get(id=documentStatusId)
-                selectionList['documentStatus'] = to_JSON(st)
-                qset = qset.filter(documentStatus=st)
-        else:
-            if 'documentStatus' in selectionList:
-                for obj in serializers.deserialize("json", selectionList['documentStatus']):
-                    st = obj.object
-        if(st):
-            selected['documentStatus'] = st
+                activeStatusList.append(int(toggleStatusId))
+            selectionList['activeStatusList'] = activeStatusList
+
+        qset = qset.filter(documentStatus_id__in=activeStatusList)
 
         self.request.session['selection_list'] = selectionList
         context['area'] = area
@@ -362,6 +358,7 @@ class ListDocumentView(TemplateView):
         context['establishment_choices'] = map(lambda s: { 'name' : s.name, 'id' : s.id }, area.establishment_set.all()) if area else []
         context['document_type_choices'] = map(lambda s: { 'name' : s.name, 'id' : s.id }, DocumentType.objects.all())
         context['document_status_choices'] = map(lambda s: { 'name' : s.name, 'id' : s.id }, DocumentStatus.objects.all())
+        context['activeStatusList'] = activeStatusList
         return context
 
 # GET/POST /document/

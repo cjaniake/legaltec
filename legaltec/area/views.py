@@ -28,7 +28,7 @@ class AreaWrapper:
     def link(self, **kwargs):
         return '/area/' if self.area.id is None else '/area/' + str(self.area.id)
     def linkentrar(self, **kwargs):
-        return '/area/' + str(self.area.id) + '/establishments?p=' + self.presentation
+        return '/area/' + str(self.area.id) + '/establishments/?p=' + self.presentation
     def icon(self, **kwargs):
         if self.priorityDocs and len(self.priorityDocs) > 0:
             return self.priorityDocs[0].documentStatus.glyphicon
@@ -139,7 +139,7 @@ class EstablishmentWrapper:
     def link(self, **kwargs):
         return '/area/' + str(self.estab.area.id) + '/establishment/'
     def linkentrar(self, **kwargs):
-        return '/documents?establishmentId=' + str(self.estab.id)
+        return '/documents/?establishmentId=' + str(self.estab.id)
     def icon(self, **kwargs):
         if self.priorityDocs:
             return self.priorityDocs[0].documentStatus.glyphicon
