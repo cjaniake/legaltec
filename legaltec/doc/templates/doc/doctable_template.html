@@ -24,7 +24,7 @@
 					</tr>
 					{% for object in object_list %}
 					<tr>
-						<td><span class="glyphicon {{ object.documentStatus.glyphicon }}" aria-hidden="true"></span>
+						<td><span class="glyphicon {{ object.documentStatus.glyphicon }}" style="color:{{ object.documentStatus.colorCode }}" aria-hidden="true"></span>
 							{{ object.establishment.name }}</td>
 						<td>{{ object.documentType.name }}</td>
 						<td>{{ object.expirationDate}}</td>
