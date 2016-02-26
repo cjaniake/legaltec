@@ -13,8 +13,9 @@ from doc.models import Document, DocumentStatus
 from legaltec.utils import to_JSON
 
 class AreaWrapper:
-    def __init__(self, area):
+    def __init__(self, area, presentation):
         self.area = area
+        self.presentation = presentation
         inner_qs = Establishment.objects.filter(area__id__exact=self.area.id)
         qset = Document.objects.filter(establishment__in=inner_qs, documentStatus__enabled=True)
         self.priorityDocs = qset.order_by('expirationDate')[:2]
@@ -27,7 +28,7 @@ class AreaWrapper:
     def link(self, **kwargs):
         return '/area/' if self.area.id is None else '/area/' + str(self.area.id)
     def linkentrar(self, **kwargs):
-        return '/area/' + str(self.area.id) + '/establishments'
+        return '/area/' + str(self.area.id) + '/establishments?p=' + self.presentation
     def icon(self, **kwargs):
         if self.priorityDocs and len(self.priorityDocs) > 0:
             return self.priorityDocs[0].documentStatus.glyphicon
@@ -50,12 +51,14 @@ class AreaWrapper:
 class ListAreaView(TemplateView):
     template_name = "area/area_objlist_small.html"
     def get_context_data(self, **kwargs):
+        presentation = self.request.GET['p'] if 'p' in self.request.GET else 'small'
         context = super(ListAreaView, self).get_context_data(**kwargs)
         #context['object_list'] = list(Area.objects.all())
-        context['object_list'] = map(lambda s: AreaWrapper(s), Area.objects.all())
+        context['object_list'] = map(lambda area: AreaWrapper(area, presentation), Area.objects.all())
+
         new = Area()
         new.name = "<nova>"
-        context['object_list'].append(AreaWrapper(new))
+        context['object_list'].append(AreaWrapper(new, presentation))
 
         # clean session information
         if 'areacode' in self.request.session:
@@ -64,8 +67,6 @@ class ListAreaView(TemplateView):
             del self.request.session['selection_list']
 
         # select template to be presented
-        presentation = self.request.GET['p'] if 'p' in self.request.GET else 'small'
-        print (presentation)
         if presentation == 'large':
             self.template_name = "area/area_objlist_large.html"
         elif presentation == 'list':
@@ -167,6 +168,7 @@ class ListEstablishmentView(TemplateView):
         self.request.session['areacode'] = areacode
         establishmentArray = area.establishment_set.all()
         context['object_list'] = map(lambda s: EstablishmentWrapper(s), establishmentArray)
+
         new = Establishment()
         new.name = "<novo>"
         new.area = area
@@ -174,7 +176,6 @@ class ListEstablishmentView(TemplateView):
 
         # select template to be presented
         presentation = self.request.GET['p'] if 'p' in self.request.GET else 'small'
-        print (presentation)
         if presentation == 'large':
             self.template_name = "area/establishment_objlist_large.html"
         elif presentation == 'list':
