@@ -24,12 +24,14 @@
 							<h3>
 								{{ object.name }}
 							</h3>
+<!--
 								{% for doc in object.content %}
 								<p>
 									<strong>{{ doc.documentType.name }}</strong><br />
 									{{ doc.expirationDate }} - {{ doc.expirationDate|timeuntil}}
 								</p>
 								{% endfor %}
+-->
 							<p>
 								{% if object.id %}
 									<a class="btn btn-primary" href="{{ object.linkentrar }}">Entrar</a> <a class="btn" href="{{ object.link }}">Alterar</a>
