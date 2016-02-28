@@ -52,9 +52,9 @@ class DocumentStatus(models.Model):
         return u'%s' % (self.name)
 
 class Document(models.Model):
-    establishment = models.ForeignKey(Establishment, verbose_name="Estabelecimento")
-    documentType = models.ForeignKey(DocumentType, verbose_name="Tipo de documento")
-    documentStatus = models.ForeignKey(DocumentStatus, verbose_name="Status do documento")
+    establishment = models.ForeignKey(Establishment, verbose_name="Estabelecimento", on_delete=models.PROTECT)
+    documentType = models.ForeignKey(DocumentType, verbose_name="Tipo de documento", on_delete=models.PROTECT)
+    documentStatus = models.ForeignKey(DocumentStatus, verbose_name="Status do documento", on_delete=models.PROTECT)
     expeditionDate = models.DateField("Data de Emissão")
     expirationDate = models.DateField("Data de Expiração")
     createdDate = models.DateField("Criado", auto_now_add=True)
@@ -63,14 +63,14 @@ class Document(models.Model):
         return u'%s %s-%s' % (self.documentType.name, self.expeditionDate, self.expirationDate)
 
 class DocumentHistory(models.Model):
-    document = models.ForeignKey(Document, verbose_name="Documento")
+    document = models.ForeignKey(Document, verbose_name="Documento", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     eventDate = models.DateTimeField(auto_now=True)
     operation = models.CharField("Operação", max_length=50)
     snapshot = models.CharField("Resumo dos dados", max_length=1000)
 
 class DocumentImageFile(models.Model):
-    document = models.ForeignKey(Document, verbose_name="Documento")
+    document = models.ForeignKey(Document, verbose_name="Documento", on_delete=models.CASCADE)
     imageFile = models.FileField(upload_to='uploads/%Y/%m/%d/')
     enabled = models.BooleanField
     uploadDate = models.DateTimeField(auto_now_add=True)
@@ -78,7 +78,7 @@ class DocumentImageFile(models.Model):
     size = models.CharField(max_length=20)
 
 class DocumentFile(models.Model):
-    document = models.ForeignKey(Document, verbose_name="Documento")
+    document = models.ForeignKey(Document, verbose_name="Documento", on_delete=models.CASCADE)
     documentFile = models.FileField(upload_to='uploads/%Y/%m/%d/')
     enabled = models.BooleanField
     uploadDate = models.DateTimeField(auto_now_add=True)

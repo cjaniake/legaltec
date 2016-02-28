@@ -18,6 +18,7 @@ from django.contrib import admin
 
 from area import views as areaviews
 from doc import views as docviews
+from customauth import views as userviews
 from django.conf.urls.static import static
 
 from legaltec import settings
@@ -49,4 +50,8 @@ urlpatterns = [
     url(r'^document/(?P<documentcode>[0-9]+)/imagefile/$', docviews.handle_imageupload),
     url(r'^document/(?P<documentcode>[0-9]+)/history/$', docviews.ListDocumentHistoryView.as_view()),
     url(r'^updateDocumentStatus/$', docviews.update_document_status),
+    url(r'^chat/user/$', userviews.ListUserMessagesView.as_view()),
+    url(r'^chat/admin/$', userviews.ListAdminMessagesView.as_view()),
+    url(r'^chat/user/post/$', userviews.handle_user_message),
+    url(r'^chat/admin/post/$', userviews.handle_admin_message),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

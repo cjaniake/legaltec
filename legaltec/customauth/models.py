@@ -30,7 +30,7 @@ class Message(models.Model):
     eventDate = models.DateTimeField(auto_now=True)
     readDate = models.DateTimeField(null=True, blank=True)
     subject = models.CharField("Assunto", max_length=100)
-    text = models.CharField("Texto da mensagem", max_length=1000)
+    text = models.TextField("Texto da mensagem", max_length=1000)
     establishment = models.ForeignKey(Establishment, verbose_name="Estabelecimento", null=True, blank=True)
     origin = models.IntegerField("Origem", choices=MESSAGE_ORIGINS, default=3)
 

@@ -1,0 +1,54 @@
+{% extends "generic_template.html" %}
+
+{% block content %}
+	<div class="row" style="margin-bottom:20px;">
+        <form action="{{ action }}" method="post">
+            {% csrf_token %}
+            <div class="col-md-9">
+                {% for field in form %}
+                    {{ field }}
+                {% endfor %}
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-primary btn-block text-center">
+                    <span class="glyphicon glyphicon-envelope" style="font-size:20px; margin-top:20px;" aria-hidden="true"></span>
+                    <p style="font-size:20px; margin-bottom:10px;"><strong>Enviar</strong></p>
+                </button>
+
+            </div>
+        </form>
+    </div>
+
+    {% for msg in msg_list %}
+	<div class="row">
+        {% if msg.origin == 1 %}
+        <div class="col-md-9">
+            <div class="well well-lg">
+                {{ msg.text|linebreaksbr }}
+                <div class="text-right">
+                    <small>
+                        {% if msg.user %}{{ msg.user.username }}{% endif %}
+                        {% if msg.establishment %}{{ msg.establishment.name }}{% endif %}
+                        {{ msg.eventDate }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+        {% else %}
+        <div class="col-md-3"></div>
+        <div class="col-md-9">
+            <div class="well well-lg" style="background: rgb(153, 204, 255);">
+                {{ msg.text|linebreaksbr }}
+                <div class="text-right">
+                    <small>
+                        {% if msg.establishment %}{{ msg.establishment.name }}{% endif %}
+                        {{ msg.eventDate }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+	</div>
+    {% endfor %}
+{% endblock %}

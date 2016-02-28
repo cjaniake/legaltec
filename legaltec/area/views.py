@@ -10,7 +10,7 @@ from django.views.generic import TemplateView
 from area.forms import AreaForm, EstablishmentForm
 from area.models import Area, Establishment
 from doc.models import Document, DocumentStatus
-from customauth.models import CustomUser
+from customauth.models import CustomUser, Message
 from legaltec.utils import to_JSON
 
 class AreaWrapper:
@@ -164,6 +164,8 @@ class EstablishmentWrapper:
             .filter(document__documentStatus__enabled=True)\
             .annotate(num_docs=Count('document'))
         return map(lambda d: {'value':d.num_docs, 'label':d.name, 'color':d.colorCode}, qset)
+    def messagecount(self, **kwargs):
+        return Message.objects.filter(establishment_id = self.id).count()
 
 # GET /area/<areacode>/establishments
 class ListEstablishmentView(TemplateView):

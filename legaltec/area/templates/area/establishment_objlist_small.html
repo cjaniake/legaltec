@@ -8,6 +8,17 @@
 				<div class="col-md-2">
 					<div class="thumbnail">
 						<div class="caption">
+
+							<div style="position:absolute; right:15px;">
+								<a href="/chat/user/?estab={{ object.id }}">
+								<span class="glyphicon glyphicon-comment btn-lg" aria-hidden="true"></span>
+								</a>
+							</div>
+							{% if object.messagecount > 0 %}
+							<div style="position:absolute; right:20px">
+								<span class="badge btn-xs">{{ object.messagecount }}</span>
+							</div>
+							{% endif %}
 							<h1 class="text-center" style="color:{{ object.iconcolor }}">
 								<span class="glyphicon {{ object.icon }}" aria-hidden="true"></span>
 							</h1>

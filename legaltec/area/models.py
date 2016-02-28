@@ -11,7 +11,7 @@ class Area(models.Model):
         return u'%s' % (self.name)
 
 class Establishment(models.Model):
-    area = models.ForeignKey(Area, verbose_name="Área")
+    area = models.ForeignKey(Area, verbose_name="Área", on_delete=models.PROTECT)
     name = models.CharField("Estabelecimento", max_length=100, unique=True)
     city = models.CharField("Cidade", max_length=100)
     state = models.CharField("Estado", max_length=2)
