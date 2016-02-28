@@ -48,7 +48,11 @@
 				</ul>
 				<ul class="nav navbar-nav nav-pills navbar-right">
 					<li>
-						<a href="#">Ajuda</a>
+						{% if request.user.is_superuser %}
+						<a href="/chat/admin/">Mensagens {%if user_messages > 0 %}<span class="badge">{{ user_messages }}</span>{% endif %}</a>
+						{% else %}
+						<a href="/chat/user/">Mensagens {%if user_messages > 0 %}<span class="badge">{{ user_messages }}</span>{% endif %}</a>
+						{% endif %}
 					</li>
 					<li class="dropdown">
 						{% if not request.user.is_authenticated %}<a href="/accounts/login">Login</a>
@@ -105,7 +109,7 @@
 				<li><a href="/area/{{ area.id }}/establishments">{{ area.name }}</a></li>
 				{% endif %}
 				{% if area and establishment %}
-				<li><a href="/area/{{ area.id }}/establishment/{{ establishment.id }}/documents">{{ location.name }}</a></li>
+				<li><a href="/documents/?establishment={{ establishment.id }}">{{ establishment.name }}</a></li>
 				{% endif %}
 			</ol>
 		</div>

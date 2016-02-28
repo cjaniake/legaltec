@@ -7,9 +7,10 @@ from customauth.models import Message
 class ChatUserMessageForm(ModelForm):
     class Meta:
         model = Message
-        fields = ['text']
+        fields = ['text', 'establishment']
         widgets = {
-            'text': forms.Textarea(attrs={'rows':4})
+            'text': forms.Textarea(attrs={'rows':4}),
+            'establishment': forms.HiddenInput()
         }
 class ChatAdminMessageForm(ModelForm):
     class Meta:

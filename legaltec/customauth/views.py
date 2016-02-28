@@ -15,9 +15,11 @@ class ListUserMessagesView(TemplateView):
         estabParam = None
         if 'estab' in self.request.GET:
             estabParam = self.request.GET['estab']
-            context['estab'] = Establishment.get(id=estabParam)
+            estab = Establishment.objects.get(id=estabParam)
+            context['establishment'] = estab
+            context['area'] = estab.area
 
-        context['form'] = ChatUserMessageForm()
+        context['form'] = ChatUserMessageForm(initial = {"establishment": estabParam})
         qset = Message.objects.filter(user_id = u.id)
         qset = qset.filter(establishment_id = estabParam)
         context['msg_list'] = qset.order_by('-eventDate')[:20]
@@ -42,6 +44,7 @@ class ListAdminMessagesView(TemplateView):
         return context
 
 def handle_user_message(request):
+    redirectTo = '/chat/user/'
     if request.method == 'POST':
 
         form = ChatUserMessageForm(request.POST)
@@ -50,23 +53,35 @@ def handle_user_message(request):
             m = Message()
             m.user = request.user
             m.text = form.cleaned_data['text']
+            establishment = form.cleaned_data['establishment']
+            if(establishment):
+                m.establishment = establishment
+                redirectTo = redirectTo + '?estab=' + str(establishment.id)
             m.origin = 1
 
             m.save()
 
-    return HttpResponseRedirect('/chat/user/')
+    return HttpResponseRedirect(redirectTo)
 
 def handle_admin_message(request):
+    redirectTo = '/chat/admin/?'
     if request.method == 'POST':
 
         form = ChatAdminMessageForm(request.POST)
 
         if form.is_valid():
             m = Message()
-            m.user = form.cleaned_data['user']
+            user = form.cleaned_data['user']
+            if(user):
+                m.user = user
+                redirectTo = redirectTo + '&user=' + str(user.id)
             m.text = form.cleaned_data['text']
             m.origin = 2
+            establishment = form.cleaned_data['establishment']
+            if(establishment):
+                m.establishment = establishment
+                redirectTo = redirectTo + '&estab=' + str(establishment.id)
 
             m.save()
 
-    return HttpResponseRedirect('/chat/admin/')
+    return HttpResponseRedirect(redirectTo)

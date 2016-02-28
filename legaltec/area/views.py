@@ -184,6 +184,10 @@ class ListEstablishmentView(TemplateView):
         new.area = area
         context['object_list'].append(EstablishmentWrapper(new))
 
+        # clean session information
+        if 'selection_list' in self.request.session:
+            del self.request.session['selection_list']
+
         # select template to be presented
         presentation = self.request.GET['p'] if 'p' in self.request.GET else 'small'
         if presentation == 'large':

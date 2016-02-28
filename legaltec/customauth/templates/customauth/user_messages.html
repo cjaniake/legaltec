@@ -14,7 +14,6 @@
                     <span class="glyphicon glyphicon-envelope" style="font-size:20px; margin-top:20px;" aria-hidden="true"></span>
                     <p style="font-size:20px; margin-bottom:10px;"><strong>Enviar</strong></p>
                 </button>
-
             </div>
         </form>
     </div>
@@ -27,8 +26,6 @@
                 {{ msg.text|linebreaksbr }}
                 <div class="text-right">
                     <small>
-                        {% if msg.user %}{{ msg.user.username }}{% endif %}
-                        {% if msg.establishment %}{{ msg.establishment.name }}{% endif %}
                         {{ msg.eventDate }}
                     </small>
                 </div>
