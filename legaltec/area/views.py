@@ -165,7 +165,12 @@ class EstablishmentWrapper:
             .annotate(num_docs=Count('document'))
         return map(lambda d: {'value':d.num_docs, 'label':d.name, 'color':d.colorCode}, qset)
     def messagecount(self, **kwargs):
-        return Message.objects.filter(establishment_id = self.id).count()
+        qset = Message.objects.filter(establishment_id = self.id).filter(readDate = None)
+        if(self.request.user.is_superuser):
+            qset = qset.filter(origin = 1)
+        else:
+            qset = qset.filter(origin__gt=1)
+        return qset.count()
 
 # GET /area/<areacode>/establishments
 class ListEstablishmentView(TemplateView):

@@ -1,7 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView
-
+from django.utils import timezone
 from area.models import Establishment
 from customauth.forms import ChatUserMessageForm, ChatAdminMessageForm
 from customauth.models import Message
@@ -22,6 +22,8 @@ class ListUserMessagesView(TemplateView):
         context['form'] = ChatUserMessageForm(initial = {"establishment": estabParam})
         qset = Message.objects.filter(user_id = u.id)
         qset = qset.filter(establishment_id = estabParam)
+        qset = qset.filter(origin__gt=1)
+        qset.update(readDate=timezone.now())
         context['msg_list'] = qset.order_by('-eventDate')[:20]
         context['action'] = '/chat/user/post/'
         return context
@@ -39,7 +41,10 @@ class ListAdminMessagesView(TemplateView):
         qset = qset.filter(establishment_id = estabParam)
         if(userParam):
             qset = qset.filter(user_id = userParam)
+        qset = qset.filter(origin=1)
+        qset.update(readDate=timezone.now())
         context['msg_list'] = qset.order_by('-eventDate')[:20]
+
         context['action'] = '/chat/admin/post/'
         return context
 
