@@ -134,10 +134,11 @@ def edit_area(request, areacode=None):
         return HttpResponseRedirect('/areas/')
 
 class EstablishmentWrapper:
-    def __init__(self, estab):
+    def __init__(self, estab, request):
         self.estab = estab
         qset = Document.objects.filter(establishment__id=self.estab.id, documentStatus__enabled=True)
         self.priorityDocs =  qset.order_by('expirationDate')[:2]
+        self.request = request
     def name(self, **kwargs):
         return self.estab.name
     def id(self, **kwargs):
@@ -166,10 +167,11 @@ class EstablishmentWrapper:
         return map(lambda d: {'value':d.num_docs, 'label':d.name, 'color':d.colorCode}, qset)
     def messagecount(self, **kwargs):
         qset = Message.objects.filter(establishment_id = self.id).filter(readDate = None)
-        if(self.request.user.is_superuser):
-            qset = qset.filter(origin = 1)
-        else:
-            qset = qset.filter(origin__gt=1)
+        if(self.request.user.is_authenticated):
+            if(self.request.user.is_superuser):
+                qset = qset.filter(origin = 1)
+            else:
+                qset = qset.filter(origin__gt=1)
         return qset.count()
 
 # GET /area/<areacode>/establishments
@@ -182,12 +184,12 @@ class ListEstablishmentView(TemplateView):
         context['area'] = area
         self.request.session['areacode'] = areacode
         establishmentArray = area.establishment_set.all()
-        context['object_list'] = map(lambda s: EstablishmentWrapper(s), establishmentArray)
+        context['object_list'] = map(lambda s: EstablishmentWrapper(s, self.request), establishmentArray)
 
         new = Establishment()
         new.name = "<novo>"
         new.area = area
-        context['object_list'].append(EstablishmentWrapper(new))
+        context['object_list'].append(EstablishmentWrapper(new, self.request))
 
         # clean session information
         if 'selection_list' in self.request.session:

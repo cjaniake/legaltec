@@ -21,7 +21,7 @@ class ListUserMessagesView(TemplateView):
 
         context['form'] = ChatUserMessageForm(initial = {"establishment": estabParam})
         qset = Message.objects.filter(user_id = u.id)
-        qset = qset.filter(establishment_id = estabParam)
+        qset = qset.filter(establishment_id = int(estabParam))
         context['msg_list'] = qset.order_by('-eventDate')[:20]
 
         qset = qset.filter(origin__gt=1)
@@ -40,7 +40,7 @@ class ListAdminMessagesView(TemplateView):
 
         context['form'] = ChatAdminMessageForm(initial = {"user": userParam, "establishment": estabParam})
         qset = Message.objects
-        qset = qset.filter(establishment_id = estabParam)
+        qset = qset.filter(establishment_id = int(estabParam))
         if(userParam):
             qset = qset.filter(user_id = userParam)
         context['msg_list'] = qset.order_by('-eventDate')[:20]

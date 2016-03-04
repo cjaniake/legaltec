@@ -10,7 +10,11 @@
 						<div class="caption">
 
 							<div style="position:absolute; right:15px;">
+								{% if request.user.is_superuser %}
+								<a href="/chat/admin/?estab={{ object.id }}">
+								{% else %}
 								<a href="/chat/user/?estab={{ object.id }}">
+								{% endif %}
 								<span class="glyphicon glyphicon-comment btn-lg" aria-hidden="true" style="color:#EEE"></span>
 								</a>
 							</div>
