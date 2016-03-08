@@ -1,0 +1,60 @@
+{% extends "generic_template.html" %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-md-3">
+		</div>
+		<div class="col-md-6">
+				<form action="{{ action }}" method="{{ http_method }}" enctype="multipart/form-data">
+					<table class="fullwidth">
+					{% csrf_token %}
+					{% for field in form %}
+						<tr>
+							<th>{{ field.label_tag }}</th>
+							<td>
+							{{ field }}
+
+							{% for fielderror in field.errors %}
+							<span class="label label-danger">{{ fielderror }}</span>
+							{% endfor %}
+
+							{% if field.help_text %}
+								<span class="label label-info">
+								{{ field.help_text|safe }}
+								</span>
+							{% endif %}
+							</td>
+						</tr>
+					{% endfor %}
+					<th></th><td>
+						<button type="submit" class="btn btn-primary">Enviar</button>
+					</td>
+					</table>
+				</form>
+		</div>
+		<div class="col-md-3">
+		</div>
+	</div>
+  	<script src="/static/js/jquery.colorPicker.min.js"></script>
+	<script src="/static/js/bootstrap-switch.js"></script>
+	<script src="/static/js/bootstrap-datepicker.js"></script>
+	<script>
+	  jQuery(document).ready(function($) {
+		$('#id_colorCode').colorPicker({colors: ["000000", "000033", "000066", "000099", "0000CC", "0000FF",
+		                                         "003300", "003333", "003366", "003399", "0033CC", "0033FF",
+		                                         "006600", "006633", "006666", "006699", "0066CC", "0066FF",
+		                                         "009900", "009933", "009966", "009999", "0099CC", "0099FF",
+		                                         "00CC00", "00CC33", "00CC66", "00CC99", "00CCCC", "00CCFF",
+		                                         "00FF00", "00FF33", "00FF66", "00FF99", "00FFCC", "00FFFF",
+		                                         "FF0000", "FF0033", "FF0066", "FF0099", "FF00CC", "FF00FF",
+		                                         "FF3300", "FF3333", "FF3366", "FF3399", "FF33CC", "FF33FF",
+		                                         "FF6600", "FF6633", "FF6666", "FF6699", "FF66CC", "FF66FF",
+		                                         "FF9900", "FF9933", "FF9966", "FF9999", "FF99CC", "FF99FF",
+		                                         "FFCC00", "FFCC33", "FFCC66", "FFCC99", "FFCCCC", "FFCCFF",
+		                                         "FFFF00", "FFFF33", "FFFF66", "FFFF99", "FFFFCC", "FFFFFF"]});
+		$(':checkbox').bootstrapSwitch();
+		$("input[name*='Date']").datepicker({format: 'yyyy-mm-dd'});
+		$("input[name='validUntil']").datepicker({format: 'yyyy-mm-dd'});
+	  });
+  	</script>
+{% endblock %}

@@ -84,3 +84,8 @@ class DocumentFile(models.Model):
     uploadDate = models.DateTimeField(auto_now_add=True)
     checksum = models.CharField(max_length=20)
     size = models.CharField(max_length=20)
+
+class DocumentField(models.Model):
+    documentTypeField = models.ForeignKey(DocumentTypeField, verbose_name="Campo de tipo de documento", on_delete=models.CASCADE)
+    document = models.ForeignKey(Document, verbose_name="Documento", on_delete=models.CASCADE)
+    stringvalue = models.CharField(max_length=100)

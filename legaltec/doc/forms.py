@@ -1,4 +1,5 @@
-from django.forms import ModelForm, Form, FileField, Field, TextInput, BooleanField
+from django import forms
+from django.forms import ModelForm, Form, FileField, Field, TextInput, BooleanField, Select
 from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document
 
 
@@ -21,11 +22,40 @@ class DocumentTypeFieldForm(ModelForm):
         model = DocumentTypeField
         fields = ['name','fieldType','help','fieldChoices']
 
-class DocumentForm(ModelForm):
+class DocumentAddForm(ModelForm):
     enabled = BooleanField(required=False, label="Ativo")
     class Meta:
         model = Document
         fields = ['establishment','documentType','expeditionDate','expirationDate']
+
+class DocumentModifForm(ModelForm):
+    enabled = BooleanField(required=False, label="Ativo")
+    class Meta:
+        model = Document
+        fields = ['establishment','documentType','expeditionDate','expirationDate']
+        widgets = {
+            'establishment': Select(attrs={'disabled': True}),
+            'documentType': Select(attrs={'disabled': True}),
+        }
+    def __init__(self, *args, **kwargs):
+            extraFields = kwargs.pop('extraFields', None)
+            super(DocumentModifForm, self).__init__(*args, **kwargs)
+
+            #(1, 'Texto'),
+            #(2, 'Inteiro'),
+            #(3, 'Decimal'),
+            #(4, 'Lista'),
+
+            if(extraFields):
+                for documentTypeField in extraFields:
+                    if(documentTypeField.fieldType == 1):
+                        self.fields['extra_%s' % documentTypeField.id] = forms.CharField(label=documentTypeField.name)
+                    if(documentTypeField.fieldType == 2):
+                        self.fields['extra_%s' % documentTypeField.id] = forms.IntegerField(label=documentTypeField.name)
+                    if(documentTypeField.fieldType == 3):
+                        self.fields['extra_%s' % documentTypeField.id] = forms.DecimalField(label=documentTypeField.name, localize=True)
+                    if(documentTypeField.fieldType == 4):
+                        self.fields['extra_%s' % documentTypeField.id] = forms.ChoiceField(label=documentTypeField.name, choices=documentTypeField.fieldChoices)
 
 class DocumentFileUploadForm(Form):
     file = FileField(label='Arquivo')

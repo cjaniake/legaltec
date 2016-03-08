@@ -12,7 +12,8 @@ from django.views.generic import TemplateView
 
 from area.models import Establishment, Area
 from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document, DocumentHistory, DocumentFile, DocumentImageFile, TIME_UNIT_CHOICES
-from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentForm, DocumentImageFileUploadForm, DocumentFileUploadForm
+from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentImageFileUploadForm, DocumentFileUploadForm, \
+    DocumentAddForm, DocumentModifForm
 from legaltec.utils import to_JSON
 
 
@@ -220,7 +221,7 @@ def handle_documenttypefield(request, doctypecode=None):
             a.name = form.cleaned_data['name']
             a.fieldType = form.cleaned_data['fieldType']
             a.fieldChoices = form.cleaned_data['fieldChoices']
-            a.documenttype = doctype
+            a.documentType_id = int(doctypecode)
 
             a.save()
             doctype.documenttypefield_set.add(a)
@@ -372,7 +373,7 @@ def handle_document(request):
 
     if request.method == 'POST':
 
-        form = DocumentForm(request.POST)
+        form = DocumentAddForm(request.POST)
 
         if form.is_valid():
             a = Document()
@@ -408,7 +409,7 @@ def handle_document(request):
             for obj in serializers.deserialize("json", selectionList['documentType']):
                 t = obj.object
         st = None
-        form = DocumentForm(initial={'establishment': e,'documentType': t })
+        form = DocumentAddForm(initial={'establishment': e,'documentType': t })
         form.fields['enabled'].initial = True
 
     return render(request, 'detail_template.html', {'form': form, 'action':'/document/', 'http_method':'POST', 'area' : area})
@@ -422,7 +423,7 @@ def edit_document(request, documentcode=None):
         if request.method == 'POST':
             #update record with submitted values
 
-            form = DocumentForm(request.POST, instance=a)
+            form = DocumentModifForm(request.POST, instance=a)
 
             if form.is_valid():
                 a.establishment = form.cleaned_data['establishment']
@@ -451,8 +452,11 @@ def edit_document(request, documentcode=None):
         else:
             #load record to allow edition
 
-            form = DocumentForm(instance=a)
+            extraFields = DocumentTypeField.objects.filter(documentType=a.documentType).all()
+
+            form = DocumentModifForm(instance=a, extraFields=extraFields)
             form.fields['enabled'].initial = a.documentStatus.enabled
+
             return render(request, 'detail_template.html', {'form': form, 'action':'/document/' + documentcode + '/', 'http_method':'POST'})
     else:
         return HttpResponseRedirect('/document/')

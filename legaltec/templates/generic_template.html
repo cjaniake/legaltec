@@ -28,9 +28,9 @@
 					</li>
 					{% endif %}
 
-					<li {% if not area %} class="disabled" {% endif %}><a href="/area/{{ area.id }}/establishments">Estabelecimentos</a></li>
+					<li {% if not request.session.areacode %} class="disabled" {% endif %}><a href="/area/{{ request.session.areacode }}/establishments">Estabelecimentos</a></li>
 
-					<li {% if not area %} class="disabled" {% endif %}>
+					<li {% if not request.session.areacode %} class="disabled" {% endif %}>
 						<a href="/documents">Documentos</a>
 					</li>
 					<li class="dropdown">
