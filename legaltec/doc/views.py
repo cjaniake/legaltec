@@ -11,7 +11,8 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from area.models import Establishment, Area
-from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document, DocumentHistory, DocumentFile, DocumentImageFile, TIME_UNIT_CHOICES
+from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document, DocumentHistory, DocumentFile, DocumentImageFile, TIME_UNIT_CHOICES, \
+    DocumentField
 from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentImageFileUploadForm, DocumentFileUploadForm, \
     DocumentAddForm, DocumentModifForm
 from legaltec.utils import to_JSON
@@ -396,7 +397,7 @@ def handle_document(request):
             h.save()
             a.documenthistory_set.add(h)
 
-            return HttpResponseRedirect('/documents/')
+            return HttpResponseRedirect('/document/' + str(a.id) + '/')
 
     else:
         selectionList = request.session.get('selection_list')
@@ -424,10 +425,13 @@ def edit_document(request, documentcode=None):
             #update record with submitted values
 
             form = DocumentModifForm(request.POST, instance=a)
+            form.data['establishment'] = str(a.establishment.id)
+            form.data['documentType'] = str(a.documentType.id)
+            form.full_clean()
 
             if form.is_valid():
-                a.establishment = form.cleaned_data['establishment']
-                a.documentType = form.cleaned_data['documentType']
+                #a.establishment = form.cleaned_data['establishment']
+                #a.documentType = form.cleaned_data['documentType']
                 a.expeditionDate = form.cleaned_data['expeditionDate']
                 a.expirationDate = form.cleaned_data['expirationDate']
                 if form.cleaned_data['enabled']:
@@ -436,6 +440,20 @@ def edit_document(request, documentcode=None):
                     a.documentStatus = DocumentStatus.objects.filter(enabled=False)[0]
 
                 a.save()
+
+                extraKeys = [x for x in form.data if x.startswith('extra_')]
+                for extraKey in extraKeys:
+                    docTpFieldId = int(extraKey[6:])
+                    docTpField = DocumentTypeField.objects.get(id=docTpFieldId)
+
+                    docField = DocumentField()
+                    docField.document = a
+                    docField.documentTypeField = docTpField
+                    docField.stringvalue = form.data[extraKey]
+
+                    docField.save()
+                    a.documentfield_set.add(docField)
+                    docTpField.documentfield_set.add(docField)
 
                 h = DocumentHistory()
                 h.user = request.user
@@ -456,6 +474,9 @@ def edit_document(request, documentcode=None):
 
             form = DocumentModifForm(instance=a, extraFields=extraFields)
             form.fields['enabled'].initial = a.documentStatus.enabled
+
+            for curValue in a.documentfield_set.all():
+                form.fields['extra_' + str(curValue.documentTypeField_id)].initial = curValue.stringvalue
 
             return render(request, 'detail_template.html', {'form': form, 'action':'/document/' + documentcode + '/', 'http_method':'POST'})
     else:

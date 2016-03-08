@@ -55,7 +55,8 @@ class DocumentModifForm(ModelForm):
                     if(documentTypeField.fieldType == 3):
                         self.fields['extra_%s' % documentTypeField.id] = forms.DecimalField(label=documentTypeField.name, localize=True)
                     if(documentTypeField.fieldType == 4):
-                        self.fields['extra_%s' % documentTypeField.id] = forms.ChoiceField(label=documentTypeField.name, choices=documentTypeField.fieldChoices)
+                        self.fields['extra_%s' % documentTypeField.id] = forms.ChoiceField(label=documentTypeField.name,
+                            choices=[x for x in enumerate(documentTypeField.fieldChoices.split(','), 1)])
 
 class DocumentFileUploadForm(Form):
     file = FileField(label='Arquivo')
