@@ -50,6 +50,7 @@ urlpatterns = [
     url(r'^document/(?P<documentcode>[0-9]+)/file/$', docviews.handle_documentupload),
     url(r'^document/(?P<documentcode>[0-9]+)/imagefile/$', docviews.handle_imageupload),
     url(r'^document/(?P<documentcode>[0-9]+)/history/$', docviews.ListDocumentHistoryView.as_view()),
+    url(r'^documenthistory/(?P<dochistorycode>[0-9]+)/$', docviews.view_history),
     url(r'^updateDocumentStatus/$', docviews.update_document_status),
     url(r'^chat/user/$', userviews.ListUserMessagesView.as_view()),
     url(r'^chat/admin/$', userviews.ListAdminMessagesView.as_view()),

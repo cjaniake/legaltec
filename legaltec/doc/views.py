@@ -16,7 +16,7 @@ from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document
 from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentImageFileUploadForm, DocumentFileUploadForm, \
     DocumentAddForm, DocumentModifForm
 from legaltec.utils import to_JSON
-
+import json
 
 class DocumentStatusWrapper:
     def __init__(self, documentstatus):
@@ -458,7 +458,7 @@ def edit_document(request, documentcode=None):
                 h = DocumentHistory()
                 h.user = request.user
                 h.operation = "MODIFICATION"
-                h.snapshot = to_JSON(a)
+                h.snapshot = serializers.serialize("json", [a, ])
                 h.document = a
 
                 h.save()
@@ -562,6 +562,12 @@ class ListDocumentHistoryView(TemplateView):
         context['event_list'] = DocumentHistory.objects.filter(document__id=document.id).all()
         context['area'] = document.establishment.area
         return context
+
+def view_history(request, dochistorycode):
+    docHistory = DocumentHistory.objects.get(id=int(dochistorycode))
+    snapshot = json.dumps(json.loads(docHistory.snapshot), indent=4)
+    return render(request, 'doc/dochistory_detail.html', {'document': docHistory.document, 'docHistory': docHistory, 'snapshot': snapshot})
+
 
 def update_document_status(request):
     inner_qs = DocumentStatus.objects.filter(enabled=True)

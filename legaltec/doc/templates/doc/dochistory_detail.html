@@ -14,29 +14,21 @@
 		</div>
 	</div>
 
+	<div class="row">
+		<div class="col-md-12">
+			<div class="col-md-6"><strong>Usuário:</strong> {{ docHistory.user.username }}</div>
+			<div class="col-md-6"><strong>Evento:</strong> {{ docHistory.operation }}</div>
+			<div class="col-md-6"><strong>Data Evento:</strong> {{ docHistory.eventDate }}</div>
+		</div>
+	</div>
+
 	<div class="row top-margin">
 		<div class="col-md-12">
 			<div class="panel panel-default">
-				<div class="panel-heading">Histórico</div>
-				<table class="table">
-					<tr>
-						<th>Usuário</th>
-						<th>Evento</th>
-						<th>Data Evento</th>
-					</tr>
-					{% for object in event_list %}
-					<tr>
-						<td>{{ object.user.username }}</td>
-						<td>{{ object.operation }}</td>
-						<td>{{ object.eventDate }}</td>
-						<td>
-							<div class="btn-group btn-group-sm" role="group" aria-label="...">
-								<a class="btn btn-primary" href="/documenthistory/{{ object.id }}/">Ver</a>
-							</div>
-						</td>
-					</tr>
-					{% endfor %}
-				</table>
+				<div class="panel-heading">Dados do documento</div>
+				<div class="panel-body">
+					{{ snapshot|linebreaksbr }}
+				</div>
 			</div>
 		</div>
 	</div>
