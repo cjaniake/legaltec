@@ -14,9 +14,11 @@
 								<span class="glyphicon glyphicon-comment btn-lg" aria-hidden="true" style="color:#EEE"></span>
 								</a>
 							</div>
+							{% if object.messagecount > 0 %}
 							<div style="position:absolute; right:20px">
 								<span class="badge btn-xs">{{ object.messagecount }}</span>
 							</div>
+							{% endif %}
 							<h1 class="text-center" style="color:{{ object.iconcolor }}">
 								<span class="glyphicon {{ object.icon }}" aria-hidden="true"></span>
 							</h1>
