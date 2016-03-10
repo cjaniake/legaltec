@@ -10,19 +10,13 @@
 						<div class="caption">
 
 							<div style="position:absolute; right:15px;">
-								{% if request.user.is_superuser %}
-								<a href="/chat/admin/?estab={{ object.id }}">
-								{% else %}
-								<a href="/chat/user/?estab={{ object.id }}">
-								{% endif %}
+								<a href="/chat/{% if request.user.is_superuser %}admin{% else %}user{% endif %}/?estab={{ object.id }}">
 								<span class="glyphicon glyphicon-comment btn-lg" aria-hidden="true" style="color:#EEE"></span>
 								</a>
 							</div>
-							{% if object.messagecount > 0 %}
 							<div style="position:absolute; right:20px">
 								<span class="badge btn-xs">{{ object.messagecount }}</span>
 							</div>
-							{% endif %}
 							<h1 class="text-center" style="color:{{ object.iconcolor }}">
 								<span class="glyphicon {{ object.icon }}" aria-hidden="true"></span>
 							</h1>

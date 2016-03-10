@@ -137,7 +137,7 @@ class EstablishmentWrapper:
     def __init__(self, estab, request):
         self.estab = estab
         qset = Document.objects.filter(establishment__id=self.estab.id, documentStatus__enabled=True)
-        self.priorityDocs =  qset.order_by('expirationDate')[:2]
+        self.priorityDocs = qset.order_by('expirationDate')[:2]
         self.request = request
     def name(self, **kwargs):
         return self.estab.name
