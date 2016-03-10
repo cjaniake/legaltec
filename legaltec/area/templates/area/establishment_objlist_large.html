@@ -30,6 +30,7 @@
 							<div style="position:absolute; right:20px">
 								<span class="badge btn-xs">{{ object.messagecount }}</span>
 							</div>
+							{% endif %}
 							<h3>
 								{{ object.name }}
 							</h3>
@@ -42,11 +43,7 @@
 								{% endfor %}
 -->
 							<p>
-								{% if object.id %}
-									<a class="btn btn-primary" href="{{ object.linkentrar }}">Entrar</a> <a class="btn" href="{{ object.link }}">Alterar</a>
-								{% else %}
-									<a class="btn btn-primary" href="{{ object.link }}">Incluir</a>
-								{% endif %}
+								<a class="btn btn-primary" href="{{ object.linkentrar }}">Entrar</a> <a class="btn" href="{{ object.link }}">Alterar</a>
 							</p>
 						</div>
 					</div>

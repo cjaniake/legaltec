@@ -11,7 +11,6 @@ from area.forms import AreaForm, EstablishmentForm
 from area.models import Area, Establishment
 from doc.models import Document, DocumentStatus
 from customauth.models import CustomUser, Message
-from legaltec.utils import to_JSON
 
 class AreaWrapper:
     def __init__(self, area, presentation):
@@ -166,13 +165,11 @@ class EstablishmentWrapper:
             .annotate(num_docs=Count('document'))
         return map(lambda d: {'value':d.num_docs, 'label':d.name, 'color':d.colorCode}, qset)
     def messagecount(self, **kwargs):
-        if self.estab.id is None:
-            return 0
         qset = Message.objects.filter(establishment_id = self.estab.id).filter(readDate = None)
         if self.request.user.is_superuser:
             qset = qset.filter(origin = 1)
         else:
-            qset = qset.filter(origin__gt=1)
+            qset = qset.filter(origin__gt=1).filter(user = self.request.user)
         return qset.count()
 
 # GET /area/<areacode>/establishments
@@ -186,11 +183,6 @@ class ListEstablishmentView(TemplateView):
         self.request.session['areacode'] = areacode
         establishmentArray = area.establishment_set.all()
         context['object_list'] = map(lambda s: EstablishmentWrapper(s, self.request), establishmentArray)
-
-        new = Establishment()
-        new.name = "<novo>"
-        new.area = area
-        context['object_list'].append(EstablishmentWrapper(new, self.request))
 
         # clean session information
         if 'selection_list' in self.request.session:
