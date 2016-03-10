@@ -166,7 +166,7 @@ class EstablishmentWrapper:
             .annotate(num_docs=Count('document'))
         return map(lambda d: {'value':d.num_docs, 'label':d.name, 'color':d.colorCode}, qset)
     def messagecount(self, **kwargs):
-        if not self.estab.id:
+        if self.estab.id is None:
             return 0
         qset = Message.objects.filter(establishment_id = self.estab.id).filter(readDate = None)
         if self.request.user.is_superuser:
