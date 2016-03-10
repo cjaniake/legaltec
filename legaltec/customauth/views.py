@@ -13,7 +13,7 @@ class ListUserMessagesView(TemplateView):
 
         u = self.request.user
         estabParam = None
-        if 'estab' in self.request.GET:
+        if 'estab' in self.request.GET and self.request.GET['estab'] != 'None':
             estabParam = self.request.GET['estab']
             estab = Establishment.objects.get(id=estabParam)
             context['establishment'] = estab
