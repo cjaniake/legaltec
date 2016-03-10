@@ -46,15 +46,15 @@ class DocumentModifForm(ModelForm):
             #(3, 'Decimal'),
             #(4, 'Lista'),
 
-            if(extraFields):
+            if extraFields:
                 for documentTypeField in extraFields:
-                    if(documentTypeField.fieldType == 1):
+                    if documentTypeField.fieldType == 1:
                         self.fields['extra_%s' % documentTypeField.id] = forms.CharField(label=documentTypeField.name)
-                    if(documentTypeField.fieldType == 2):
+                    if documentTypeField.fieldType == 2:
                         self.fields['extra_%s' % documentTypeField.id] = forms.IntegerField(label=documentTypeField.name)
-                    if(documentTypeField.fieldType == 3):
+                    if documentTypeField.fieldType == 3:
                         self.fields['extra_%s' % documentTypeField.id] = forms.DecimalField(label=documentTypeField.name, localize=True)
-                    if(documentTypeField.fieldType == 4):
+                    if documentTypeField.fieldType == 4:
                         self.fields['extra_%s' % documentTypeField.id] = forms.ChoiceField(label=documentTypeField.name,
                             choices=[x for x in enumerate(documentTypeField.fieldChoices.split(','), 1)])
 

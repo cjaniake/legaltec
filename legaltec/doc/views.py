@@ -70,7 +70,7 @@ def handle_documentstatus(request):
 # GET/POST /area/<docstatuscode>
 @login_required
 def edit_documentstatus(request, docstatuscode=None):
-    if(docstatuscode):
+    if docstatuscode:
         a = DocumentStatus.objects.get(id=int(docstatuscode))
 
         if request.method == 'POST':
@@ -152,7 +152,7 @@ def handle_documenttype(request):
 # GET/POST /area/<doctypecode>
 @login_required
 def edit_documenttype(request, doctypecode=None):
-    if(doctypecode):
+    if doctypecode:
         a = DocumentType.objects.get(id=int(doctypecode))
 
         if request.method == 'POST':
@@ -237,7 +237,7 @@ def handle_documenttypefield(request, doctypecode=None):
 @login_required
 def edit_documenttypefield(request, doctypecode=None, doctypefieldcode=None):
     doctype = DocumentType.objects.get(id=int(doctypecode))
-    if(doctypecode and doctypefieldcode):
+    if doctypecode and doctypefieldcode:
         a = DocumentTypeField.objects.get(id=int(doctypefieldcode))
 
         if request.method == 'POST':
@@ -291,17 +291,17 @@ class ListDocumentView(TemplateView):
         qset = Document.objects
         selectionList = self.request.session.get('selection_list') # keep serialized version
         selected = {}                                              # keep object version
-        if(not selectionList):
+        if not selectionList:
             selectionList = {}
 
         areacode = self.request.session.get('areacode')
-        if(areacode):
+        if areacode:
             area = Area.objects.get(id=int(areacode))
 
         e = None
         establishmentId = self.request.GET.get('establishmentId')
-        if(establishmentId):
-            if(establishmentId=='None'):
+        if establishmentId:
+            if establishmentId=='None':
                 if 'establishment' in selectionList:
                     del selectionList['establishment']
             else:
@@ -314,7 +314,7 @@ class ListDocumentView(TemplateView):
             if 'establishment' in selectionList:
                 for obj in serializers.deserialize("json", selectionList['establishment']):
                     e = obj.object
-        if(e):
+        if e:
             selected['establishment'] = e
             qset = qset.filter(establishment=e)
         else:
@@ -323,8 +323,8 @@ class ListDocumentView(TemplateView):
 
         t = None
         documentTypeId = self.request.GET.get('documentTypeId')
-        if(documentTypeId):
-            if(documentTypeId=='None'):
+        if documentTypeId:
+            if documentTypeId=='None':
                 if 'documentType' in selectionList:
                     del selectionList['documentType']
             else:
@@ -334,7 +334,7 @@ class ListDocumentView(TemplateView):
             if 'documentType' in selectionList:
                 for obj in serializers.deserialize("json", selectionList['documentType']):
                     t = obj.object
-        if(t):
+        if t:
             selected['documentType'] = t
             qset = qset.filter(documentType=t)
 
@@ -342,8 +342,8 @@ class ListDocumentView(TemplateView):
             if 'activeStatusList' in selectionList \
             else list(DocumentStatus.objects.filter(enabled=True).values_list('id', flat=True))
         toggleStatusId = self.request.GET.get('toggleDocumentStatusId')
-        if(toggleStatusId):
-            if(int(toggleStatusId) in activeStatusList):
+        if toggleStatusId:
+            if int(toggleStatusId) in activeStatusList:
                 activeStatusList.remove(int(toggleStatusId))
             else:
                 activeStatusList.append(int(toggleStatusId))
@@ -368,7 +368,7 @@ class ListDocumentView(TemplateView):
 def handle_document(request):
     area = None
     areacode = request.session.get('areacode')
-    if(areacode):
+    if areacode:
         area = Area.objects.get(id=int(areacode))
 
 

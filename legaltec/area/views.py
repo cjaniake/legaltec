@@ -55,7 +55,7 @@ class ListAreaView(TemplateView):
         if not request.user.is_authenticated():
             return HttpResponseRedirect('/accounts/login/')
         c = CustomUser.objects.filter(user__id=request.user.id)
-        if(c and c[0].area):
+        if c and c[0].area:
             return HttpResponseRedirect('/area/' + str(c[0].area.id) + '/establishments/')
         return super(ListAreaView, self).dispatch(request, *args, **kwargs)
     def get_context_data(self, **kwargs):
@@ -106,7 +106,7 @@ def handle_area(request):
 
 # GET/POST /area/<areacode>
 def edit_area(request, areacode=None):
-    if(areacode):
+    if areacode:
         a = Area.objects.get(id=int(areacode))
 
         if request.method == 'POST':
@@ -167,11 +167,11 @@ class EstablishmentWrapper:
         return map(lambda d: {'value':d.num_docs, 'label':d.name, 'color':d.colorCode}, qset)
     def messagecount(self, **kwargs):
         qset = Message.objects.filter(establishment_id = self.id).filter(readDate = None)
-        if(self.request.user.is_authenticated()):
-            if(self.request.user.is_superuser):
-                qset = qset.filter(origin = 1)
-            else:
-                qset = qset.filter(origin__gt=1)
+        #if self.request.user.is_authenticated():
+        if self.request.user.is_superuser:
+            qset = qset.filter(origin = 1)
+        else:
+            qset = qset.filter(origin__gt=1)
         return qset.count()
 
 # GET /area/<areacode>/establishments
@@ -232,7 +232,7 @@ def handle_establishment(request, areacode=None):
 
 # GET/POST /area/<areacode>/establishment/<establishmentid>
 def edit_establishment(request, areacode=None, establishmentid=None):
-    if(areacode and establishmentid):
+    if areacode and establishmentid:
         area = Area.objects.get(id=int(areacode))
         l = Establishment.objects.get(id=int(establishmentid))
 

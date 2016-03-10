@@ -41,7 +41,7 @@ class ListAdminMessagesView(TemplateView):
         context['form'] = ChatAdminMessageForm(initial = {"user": userParam, "establishment": estabParam})
         qset = Message.objects
         qset = qset.filter(establishment_id = int(estabParam) if estabParam else None)
-        if(userParam):
+        if userParam:
             qset = qset.filter(user_id = userParam)
         context['msg_list'] = qset.order_by('-eventDate')[:20]
 
@@ -62,7 +62,7 @@ def handle_user_message(request):
             m.user = request.user
             m.text = form.cleaned_data['text']
             establishment = form.cleaned_data['establishment']
-            if(establishment):
+            if establishment:
                 m.establishment = establishment
                 redirectTo = redirectTo + '?estab=' + str(establishment.id)
             m.origin = 1
@@ -80,13 +80,13 @@ def handle_admin_message(request):
         if form.is_valid():
             m = Message()
             user = form.cleaned_data['user']
-            if(user):
+            if user:
                 m.user = user
                 redirectTo = redirectTo + '&user=' + str(user.id)
             m.text = form.cleaned_data['text']
             m.origin = 2
             establishment = form.cleaned_data['establishment']
-            if(establishment):
+            if establishment:
                 m.establishment = establishment
                 redirectTo = redirectTo + '&estab=' + str(establishment.id)
 
