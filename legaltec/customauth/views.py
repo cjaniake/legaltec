@@ -5,6 +5,32 @@ from django.utils import timezone
 from area.models import Establishment
 from customauth.forms import ChatUserMessageForm, ChatAdminMessageForm
 from customauth.models import Message
+from django.core.cache import cache
+
+def countUserMsg(user):
+    qset = Message.objects.filter(establishment_id = None).filter(readDate = None)
+    if user is None or user.is_superuser:
+        qset = qset.filter(origin = 1)
+    else:
+        qset = qset.filter(origin__gt=1).filter(user = user)
+    return qset.count()
+
+def cacheKeyUser(user):
+    cache_key = 'usermsg_'
+    if user is None or user.is_superuser: cache_key = cache_key + 'SU'
+    else: cache_key = cache_key + str(user.id)
+
+def cacheUserMsg(request, user):
+    cache_time = 1800 # time to live in seconds
+    result = cache.get(cacheKeyUser(user))
+    if not result:
+        result = countUserMsg(user)
+        cache.set(cacheKeyUser(user), result, cache_time)
+    return result
+
+class UserMsgMiddleware(object):
+    def process_request(self, request):
+        request.session['user_messages'] = cacheUserMsg(request, request.user)
 
 class ListUserMessagesView(TemplateView):
     template_name = "customauth/user_messages.html"
@@ -26,6 +52,7 @@ class ListUserMessagesView(TemplateView):
 
         qset = qset.filter(origin__gt=1)
         qset.update(readDate=timezone.now())
+        cache.delete(cacheKeyUser(u))
 
         context['action'] = '/chat/user/post/'
         return context
@@ -47,6 +74,7 @@ class ListAdminMessagesView(TemplateView):
 
         qset = qset.filter(origin=1)
         qset.update(readDate=timezone.now())
+        cache.delete(cacheKeyUser(None))
 
         context['action'] = '/chat/admin/post/'
         return context
@@ -68,6 +96,7 @@ def handle_user_message(request):
             m.origin = 1
 
             m.save()
+            cache.delete(cacheKeyUser(None))
 
     return HttpResponseRedirect(redirectTo)
 
@@ -91,5 +120,7 @@ def handle_admin_message(request):
                 redirectTo = redirectTo + '&estab=' + str(establishment.id)
 
             m.save()
+            cache.delete(cacheKeyUser(user))
+
 
     return HttpResponseRedirect(redirectTo)

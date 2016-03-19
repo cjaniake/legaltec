@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-
 from django.contrib.auth.models import User
-
 from area.models import Area, Establishment
 
 class CustomUser(models.Model):
@@ -34,6 +32,7 @@ class Message(models.Model):
     establishment = models.ForeignKey(Establishment, verbose_name="Estabelecimento", null=True, blank=True)
     origin = models.IntegerField("Origem", choices=MESSAGE_ORIGINS, default=3)
 
+import customauth.receiver
 
 
 

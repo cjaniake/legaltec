@@ -2,7 +2,9 @@
 import logging
 
 from django.core.serializers import json
+from django.core.signals import request_finished
 from django.db.models import Count
+from django.dispatch import receiver
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView
@@ -171,6 +173,8 @@ class EstablishmentWrapper:
         else:
             qset = qset.filter(origin__gt=1).filter(user = self.request.user)
         return qset.count()
+
+
 
 # GET /area/<areacode>/establishments
 class ListEstablishmentView(TemplateView):

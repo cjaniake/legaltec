@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.exceptions import ValidationError
 from django.core.serializers import json
+from django.core.signals import request_finished
+from django.dispatch import receiver
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView
@@ -397,7 +399,11 @@ def handle_document(request):
             h.save()
             a.documenthistory_set.add(h)
 
-            return HttpResponseRedirect('/document/' + str(a.id) + '/')
+            extraFieldsCount = DocumentTypeField.objects.filter(documentType=a.documentType).count()
+            if extraFieldsCount > 0:
+                return HttpResponseRedirect('/document/' + str(a.id) + '/')
+            else:
+                return HttpResponseRedirect('/documents/')
 
     else:
         selectionList = request.session.get('selection_list')
