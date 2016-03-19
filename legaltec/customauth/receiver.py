@@ -4,7 +4,8 @@ from django.dispatch import receiver
 from django.core import serializers
 
 from customauth.models import SystemEvent
-
+import threading
+from threadlocals.threadlocals import get_current_user
 
 @receiver(post_save)
 def handle_post_save(sender, instance, created, **kwargs):
@@ -14,5 +15,7 @@ def handle_post_save(sender, instance, created, **kwargs):
         evt.operation = 'SAVE'
         evt.snapshot = serializers.serialize("json", [instance, ])
         evt.error = False
+
+        evt.user = get_current_user()
 
         evt.save()

@@ -6,6 +6,7 @@ from area.models import Establishment
 from customauth.forms import ChatUserMessageForm, ChatAdminMessageForm
 from customauth.models import Message
 from django.core.cache import cache
+import threading
 
 def countUserMsg(user):
     qset = Message.objects.filter(establishment_id = None).filter(readDate = None)

@@ -10,7 +10,7 @@ class CustomUser(models.Model):
         verbose_name = "Custom information"
 
 class SystemEvent(models.Model):
-    user = models.OneToOneField(User, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     eventDate = models.DateTimeField(auto_now_add=True)
     entity = models.CharField("Entidade", max_length=50)
     operation = models.CharField("Operação", max_length=50)
