@@ -23,7 +23,7 @@ class ChatAdminMessageForm(ModelForm):
 class EventForm(ModelForm):
     class Meta:
         model = SystemEvent
-        fields = ['user','eventDate','entity','operation','error','snapshot']
+        fields = ['user','entity','operation','error','snapshot']
         widgets = {
             'snapshot': forms.Textarea(attrs={'rows':4})
         }

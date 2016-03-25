@@ -136,25 +136,27 @@ class ListEventsView(TemplateView):
 
         u = self.request.user
         estabParam = None
+        pageParam = 1
         if 'page' in self.request.GET and self.request.GET['page'] != 'None':
             pageParam = int(self.request.GET['page'])
-            pagesize=20
-            start=(pageParam-1)*pagesize
-            if start < 0: start = 0
-            end=start + pagesize + 1
-            events = SystemEvent.objects.all()[start:end]
-            context['page'] = pageParam
-            context['page1'] = pageParam + 1
-            context['page2'] = pageParam + 2
-            context['page3'] = pageParam + 3
-            context['page4'] = pageParam + 4
-            context['pagePrev'] = pageParam - 1 if pageParam > 5 else 1
-            context['pageNext'] = pageParam + 1 if pageParam > 1 else 2
-            context['event_list'] = events
+
+        pagesize=20
+        start=(pageParam-1)*pagesize
+        if start < 0: start = 0
+        end=start + pagesize + 1
+        events = SystemEvent.objects.all()[start:end]
+        context['page'] = pageParam
+        context['page1'] = pageParam + 1
+        context['page2'] = pageParam + 2
+        context['page3'] = pageParam + 3
+        context['page4'] = pageParam + 4
+        context['pagePrev'] = pageParam - 1 if pageParam > 5 else 1
+        context['pageNext'] = pageParam + 1 if pageParam > 1 else 2
+        context['event_list'] = events
 
         return context
 
 def view_event(request, eventid=None):
     evt = SystemEvent.objects.get(id=int(eventid))
     form = EventForm(instance=evt)
-    return render(request, 'listdetail_template.html', {'form': form, 'action':'/events/', 'http_method':'POST'})
+    return render(request, 'customauth/event_detail.html', {'form': form, 'event':evt, 'action':'/events/'})
