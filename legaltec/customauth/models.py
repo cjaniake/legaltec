@@ -16,6 +16,8 @@ class SystemEvent(models.Model):
     operation = models.CharField("Operação", max_length=50)
     snapshot = models.CharField("Resumo dos dados", max_length=1000)
     error = models.BooleanField("Erro", default=False)
+    def __unicode__(self):
+        return u'%s %s %s' % (self.operation, self.entity, self.snapshot)
 
 MESSAGE_ORIGINS = (
     (1, 'User'),
@@ -31,6 +33,8 @@ class Message(models.Model):
     text = models.TextField("Texto da mensagem", max_length=1000)
     establishment = models.ForeignKey(Establishment, verbose_name="Estabelecimento", null=True, blank=True)
     origin = models.IntegerField("Origem", choices=MESSAGE_ORIGINS, default=3)
+    def __unicode__(self):
+        return u'%s %s %s' % (self.eventDate, self.text)
 
 import customauth.receiver
 

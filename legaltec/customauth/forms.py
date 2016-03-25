@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm, TextInput
 
-from customauth.models import Message
+from customauth.models import Message, SystemEvent
 
 
 class ChatUserMessageForm(ModelForm):
@@ -18,4 +18,12 @@ class ChatAdminMessageForm(ModelForm):
         fields = ['user','establishment','text']
         widgets = {
             'text': forms.Textarea(attrs={'rows':4})
+        }
+
+class EventForm(ModelForm):
+    class Meta:
+        model = SystemEvent
+        fields = ['user','eventDate','entity','operation','error','snapshot']
+        widgets = {
+            'snapshot': forms.Textarea(attrs={'rows':4})
         }

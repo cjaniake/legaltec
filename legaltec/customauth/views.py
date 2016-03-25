@@ -3,10 +3,13 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.utils import timezone
 from area.models import Establishment
-from customauth.forms import ChatUserMessageForm, ChatAdminMessageForm
+from customauth.forms import ChatUserMessageForm, ChatAdminMessageForm, EventForm
 from customauth.models import Message
 from django.core.cache import cache
 import threading
+
+from customauth.models import SystemEvent
+
 
 def countUserMsg(user):
     qset = Message.objects.filter(establishment_id = None).filter(readDate = None)
@@ -125,3 +128,33 @@ def handle_admin_message(request):
 
 
     return HttpResponseRedirect(redirectTo)
+
+class ListEventsView(TemplateView):
+    template_name = "customauth/event_list.html"
+    def get_context_data(self, **kwargs):
+        context = super(ListEventsView, self).get_context_data(**kwargs)
+
+        u = self.request.user
+        estabParam = None
+        if 'page' in self.request.GET and self.request.GET['page'] != 'None':
+            pageParam = int(self.request.GET['page'])
+            pagesize=20
+            start=(pageParam-1)*pagesize
+            if start < 0: start = 0
+            end=start + pagesize + 1
+            events = SystemEvent.objects.all()[start:end]
+            context['page'] = pageParam
+            context['page1'] = pageParam + 1
+            context['page2'] = pageParam + 2
+            context['page3'] = pageParam + 3
+            context['page4'] = pageParam + 4
+            context['pagePrev'] = pageParam - 1 if pageParam > 5 else 1
+            context['pageNext'] = pageParam + 1 if pageParam > 1 else 2
+            context['event_list'] = events
+
+        return context
+
+def view_event(request, eventid=None):
+    evt = SystemEvent.objects.get(id=int(eventid))
+    form = EventForm(instance=evt)
+    return render(request, 'listdetail_template.html', {'form': form, 'action':'/events/', 'http_method':'POST'})
