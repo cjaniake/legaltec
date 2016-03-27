@@ -6,6 +6,7 @@ from area.models import Establishment
 from customauth.forms import ChatUserMessageForm, ChatAdminMessageForm, EventForm
 from customauth.models import Message
 from django.core.cache import cache
+from django.contrib.auth import logout as djangologout
 import threading
 
 from customauth.models import SystemEvent
@@ -34,7 +35,8 @@ def cacheUserMsg(request, user):
 
 class UserMsgMiddleware(object):
     def process_request(self, request):
-        request.session['user_messages'] = cacheUserMsg(request, request.user)
+        if not request.user.is_anonymous():
+            request.session['user_messages'] = cacheUserMsg(request, request.user)
 
 class ListUserMessagesView(TemplateView):
     template_name = "customauth/user_messages.html"
@@ -150,8 +152,8 @@ class ListEventsView(TemplateView):
         context['page2'] = pageParam + 2
         context['page3'] = pageParam + 3
         context['page4'] = pageParam + 4
-        context['pagePrev'] = pageParam - 1 if pageParam > 5 else 1
-        context['pageNext'] = pageParam + 1 if pageParam > 1 else 2
+        context['pagePrev'] = pageParam - 1 if pageParam > 1 else 1
+        context['pageNext'] = pageParam + 1
         context['event_list'] = events
 
         return context
@@ -160,3 +162,7 @@ def view_event(request, eventid=None):
     evt = SystemEvent.objects.get(id=int(eventid))
     form = EventForm(instance=evt)
     return render(request, 'customauth/event_detail.html', {'form': form, 'event':evt, 'action':'/events/'})
+
+def logout(request):
+    djangologout(request)
+    return HttpResponseRedirect('/accounts/login/')

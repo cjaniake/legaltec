@@ -42,7 +42,7 @@
                         <td>{{ event.operation }}</td>
                         <td>{{ event.entity }}</td>
                         <td>{{ event.eventDate|date:"D d M Y" }}</td>
-                        <td><a href="/event/{{ event.id }}">Log</a></td>
+                        <td><a href="/event/{{ event.id }}">Detalhes</a></td>
                     </tr>
 
 				{% endfor %}
@@ -54,8 +54,9 @@
 		<div class="col-md-12">
             <nav>
               <ul class="pager">
-                <li><a href="/events/?page={{ pagePrev }}">Previous</a></li>
-                <li><a href="/events/?page={{ pageNext }}">Next</a></li>
+                <li><a href="/events/?page={{ pagePrev }}">Anterior</a></li>
+                <li>pág {{ page }}</li>
+                <li><a href="/events/?page={{ pageNext }}">Próxima</a></li>
               </ul>
             </nav>
 		</div>

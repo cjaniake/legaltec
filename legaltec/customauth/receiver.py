@@ -22,7 +22,7 @@ def handle_post_save(sender, instance, created, **kwargs):
         evt.save()
 
 @receiver(pre_delete)
-def handle_pre_delete(sender, instance, created, **kwargs):
+def handle_pre_delete(sender, instance, **kwargs):
     if instance.__module__ in ['customauth.models', 'area.models', 'doc.models']:
         evt = SystemEvent();
         evt.entity = instance.__class__.__name__

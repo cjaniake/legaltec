@@ -7,15 +7,35 @@
 		<div class="col-md-6">
 				<form action="{{ action }}" method="{{ http_method }}" enctype="multipart/form-data">
 					<table class="fullwidth">
-					{% for field in form %}
-						<tr>
-							<th>{{ field.label_tag }}</th>
-							<td>{{ field }}</td>
-						</tr>
-					{% endfor %}
+					<tr>
+						<th>User:</th>
+						<td>{{ event.user }}</td>
+					</tr>
+					<tr>
+						<th>Data:</th>
+						<td>{{ event.eventDate }}</td>
+					</tr>
+					<tr>
+						<th>Entidade:</th>
+						<td>{{ event.entity }}</td>
+					</tr>
+					<tr>
+						<th>Operação:</th>
+						<td>{{ event.operation }}</td>
+					</tr>
+					<tr>
+						<th>Erro:</th>
+						<td>{{ event.error }}</td>
+					</tr>
+					<tr>
+						<th>Resumo dos Dados:</th>
+						<td>{{ event.snapshot }}</td>
+					</tr>
+					<tr>
 					<th></th><td>
 						<button class="btn btn-primary">OK</button>
 					</td>
+					</tr>
 					</table>
 				</form>
 		</div>

@@ -68,14 +68,14 @@
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ request.user.username }}<strong class="caret"></strong></a>
 						<ul class="dropdown-menu">
 							<li>
-								<a href="#">Usuário</a>
+								<a href="/admin/auth/user/{{ request.user.id }}/">Usuário</a>
 							</li>
 							<li>
-								<a href="#">Segurança</a>
+								<a href="/admin/">Segurança</a>
 							</li>
 							<li class="divider">
 							<li>
-								<a href="/accounts/logout/">Sair</a>
+								<a href="/logout/">Sair</a>
 							</li>
 						</ul>
 						{% endif %}

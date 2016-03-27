@@ -57,5 +57,7 @@ urlpatterns = [
     url(r'^chat/user/post/$', userviews.handle_user_message),
     url(r'^chat/admin/post/$', userviews.handle_admin_message),
     url(r'^events/$', userviews.ListEventsView.as_view()),
-    url(r'^event/(?P<eventid>[0-9]+)/$', userviews.view_event)
+    url(r'^event/(?P<eventid>[0-9]+)/$', userviews.view_event),
+    url(r'^logout/$', userviews.logout),
+    url(r'^(?P<url>.*)/$', areaviews.ListAreaView.as_view())
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
