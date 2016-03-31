@@ -57,9 +57,9 @@
 				<ul class="nav navbar-nav nav-pills navbar-right">
 					<li>
 						{% if request.user.is_superuser %}
-						<a href="/chat/admin/">Mensagens {%if request.session.user_messages > 0 %}<span class="badge">{{ request.session.user_messages }}</span>{% endif %}</a>
+						<a href="/chat/admin/"><span style="font-size:26px;" class="glyphicon glyphicon-envelope" />{%if request.session.user_messages > 0 %}<span class="badge">{{ request.session.user_messages }}</span>{% endif %}</a>
 						{% else %}
-						<a href="/chat/user/">Mensagens {%if request.session.user_messages > 0 %}<span class="badge">{{ request.session.user_messages }}</span>{% endif %}</a>
+						<a href="/chat/user/"><span style="font-size:26px;" class="glyphicon glyphicon-envelope" />{%if request.session.user_messages > 0 %}<span class="badge">{{ request.session.user_messages }}</span>{% endif %}</a>
 						{% endif %}
 					</li>
 					<li class="dropdown">
