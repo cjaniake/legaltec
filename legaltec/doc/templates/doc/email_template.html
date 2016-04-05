@@ -1,0 +1,46 @@
+{% extends "generic_template.html" %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-md-3">
+		</div>
+		<div class="col-md-6">
+				<form action="{{ action }}" method="POST">
+					<table class="fullwidth">
+					{% csrf_token %}
+					{% for field in form %}
+						<tr>
+							<th>{{ field.label_tag }}</th>
+							<td>
+							{{ field }}
+
+							{% for fielderror in field.errors %}
+							<span class="label label-danger">{{ fielderror }}</span>
+							{% endfor %}
+
+							{% if field.help_text %}
+								<span class="label label-info">
+								{{ field.help_text|safe }}
+								</span>
+							{% endif %}
+							</td>
+						</tr>
+					{% endfor %}
+						<tr>
+						</tr>
+					{% for file in attachments %}
+						<tr>
+							<th>Anexo</th>
+							<td>{{ file.documentFile.name }} {{ file.size|filesizeformat }}</td>
+						</tr>
+					{% endfor %}
+					<th></th><td>
+						<button type="submit" class="btn btn-primary">Enviar</button>
+					</td>
+					</table>
+				</form>
+		</div>
+		<div class="col-md-3">
+		</div>
+	</div>
+{% endblock %}

@@ -16,9 +16,10 @@ from area.models import Establishment, Area
 from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document, DocumentHistory, DocumentFile, DocumentImageFile, TIME_UNIT_CHOICES, \
     DocumentField
 from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentImageFileUploadForm, DocumentFileUploadForm, \
-    DocumentAddForm, DocumentModifForm
+    DocumentAddForm, DocumentModifForm, EmailForm
 from legaltec.utils import to_JSON
 import json
+from django.core.mail import EmailMessage
 
 class DocumentStatusWrapper:
     def __init__(self, documentstatus):
@@ -598,7 +599,6 @@ def verifyStatusChange(doc):
         h.save()
         doc.documenthistory_set.add(h)
 
-
 def statusForExpirationDate(expirationDate):
     qs = DocumentStatus.objects.filter(enabled=True)
     d = {s.minimumTime * s.minimumTimeUnit: s for s in qs.all()}
@@ -609,3 +609,43 @@ def statusForExpirationDate(expirationDate):
             s = d[days]
     return s
 
+def emaildocument(request, documentcode):
+    doc = Document.objects.get(id=int(documentcode))
+    file_list = DocumentFile.objects.filter(document__id=doc.id).all()
+
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            m = EmailMessage()
+            m.subject = form.cleaned_data['subject']
+            m.body = form.cleaned_data['body']
+            m.to = [form.cleaned_data['to']]
+            m.cc = [form.cleaned_data['cc']]
+            for file in file_list:
+                m.attach_file(file.documentFile.name)
+            m.send()
+            return HttpResponseRedirect('/documents/')
+
+    else:
+        form = EmailForm()
+    return render(request, 'doc/email_template.html', {'document': doc, 'form': form, 'attachments': file_list, 'action': '/document/' + documentcode + '/email/'})
+
+def emaildocumentfile(request, documentcode, filecode):
+    doc = Document.objects.get(id=int(documentcode))
+    file = DocumentFile.objects.get(id=int(filecode))
+
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            m = EmailMessage()
+            m.subject = form.cleaned_data['subject']
+            m.body = form.cleaned_data['body']
+            m.to = [form.cleaned_data['to']]
+            m.cc = [form.cleaned_data['cc']]
+            m.attach_file(file.documentFile.name)
+            m.send()
+            return HttpResponseRedirect('/document/' + documentcode + '/')
+
+    else:
+        form = EmailForm()
+    return render(request, 'doc/email_template.html', {'document': doc, 'form': form, 'attachments': [file], 'action': '/document/' + documentcode + '/file/' + filecode + '/email/'})

@@ -114,3 +114,10 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = ''
 
 MEDIA_URL = '/uploads/'
+
+EMAIL_HOST = 'br254.hostgator.com.br'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'auto@legaltec.net.br'
+EMAIL_HOST_PASSWORD = 'MA38SvQ(WeuM'
+EMAIL_USE_SSL = True
+DEFAULT_FROM_EMAIL = 'auto@legaltec.net.br'

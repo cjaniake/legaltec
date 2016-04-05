@@ -31,8 +31,9 @@
 						<td>{{ object.uploadDate }}</td>
 						<td>
 							<div class="btn-group btn-group-sm" role="group" aria-label="...">
-								<a class="btn btn-default" href="{{ object.documentFile.url }}" download>Download</a>
-								<a class="btn btn-primary" href="{{ object.documentFile.url }}">Ver</a>
+								<a class="btn btn-default" href="{{ object.documentFile.url }}" download><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a>
+								<a class="btn btn-default" href="{{ object.documentFile.url }}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
+								<a class="btn btn-default" href="/document/{{ document.id }}/file/{{ object.id }}/email"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a>
 							</div>
 						</td>
 					</tr>
@@ -50,39 +51,4 @@
 		</div>
 	</div>
 
-	<div class="row top-margin">
-		<div class="col-md-12">
-			<div class="panel panel-default">
-				<div class="panel-heading">Imagens</div>
-				<table class="table">
-					<tr>
-						<th>Arquivo</th>
-						<th>Tamanho</th>
-						<th>Data Upload</th>
-					</tr>
-					{% for object in imagefile_list %}
-					<tr>
-						<td>{{ object.imageFile.name }}</td>
-						<td>{{ object.size|filesizeformat }}</td>
-						<td>{{ object.uploadDate }}</td>
-						<td>
-							<div class="btn-group btn-group-sm" role="group" aria-label="...">
-								<a class="btn btn-default" href="{{ object.imageFile.url }}" download>Download</a>
-								<a class="btn btn-primary" href="{{ object.imageFile.url }}">Ver</a>
-							</div>
-						</td>
-					</tr>
-					{% endfor %}
-				</table>
-
-			</div>
-			<form action="/document/{{ document.id }}/imagefile/" method="POST" enctype="multipart/form-data">
-					{% csrf_token %}
-					{% for field in imagefile_upload_form %}
-					{{ field }}
-					{% endfor %}
-					<button type="submit" class="btn btn-primary btn-sm">Enviar Imagem</button>
-			</form>
-		</div>
-	</div>
 {% endblock %}

@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import ModelForm, Form, FileField, Field, TextInput, BooleanField, Select
+from django.forms import ModelForm, Form, FileField, Field, TextInput, BooleanField, Select, EmailField, CharField
 from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document
 
 
@@ -63,3 +63,9 @@ class DocumentFileUploadForm(Form):
 
 class DocumentImageFileUploadForm(Form):
     file = FileField(label='Arquivo')
+
+class EmailForm(Form):
+    to = EmailField(label='Para')
+    cc = EmailField(label='CC')
+    subject = CharField(label='Assunto', widget=forms.TextInput(attrs={'size':80}))
+    body = CharField(label='Texto', widget=forms.TextInput(attrs={'size':80}))
