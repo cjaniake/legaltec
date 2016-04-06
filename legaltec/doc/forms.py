@@ -66,6 +66,6 @@ class DocumentImageFileUploadForm(Form):
 
 class EmailForm(Form):
     to = EmailField(label='Para')
-    cc = EmailField(label='CC')
+    cc = EmailField(label='CC', required=False)
     subject = CharField(label='Assunto', widget=forms.TextInput(attrs={'size':80}))
-    body = CharField(label='Texto', widget=forms.TextInput(attrs={'size':80}))
+    body = CharField(label='Texto', widget=forms.Textarea(attrs={'size':80}))
