@@ -31,9 +31,10 @@
 						<td>{{ object.uploadDate }}</td>
 						<td>
 							<div class="btn-group btn-group-sm" role="group" aria-label="...">
-								<a class="btn btn-default" href="{{ object.documentFile.url }}" download><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a>
-								<a class="btn btn-default" href="{{ object.documentFile.url }}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
-								<a class="btn btn-default" href="/document/{{ document.id }}/file/{{ object.id }}/email"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a>
+								<a class="btn btn-default" href="{{ object.documentFile.url }}" download title="Download"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a>
+								<a class="btn btn-default" href="{{ object.documentFile.url }}" title="Abrir"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
+								<a class="btn btn-default" href="/document/{{ document.id }}/file/{{ object.id }}/email" title="Enviar email"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a>
+								<a class="btn btn-default" href="/document/{{ document.id }}/file/{{ object.id }}/print" target="_blank" title="Imprimir"><span class="glyphicon glyphicon-print" aria-hidden="true"></span></a>
 							</div>
 						</td>
 					</tr>

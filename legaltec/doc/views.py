@@ -649,3 +649,7 @@ def emaildocumentfile(request, documentcode, filecode):
     else:
         form = EmailForm(initial={'subject': doc.documentType.name, 'body': 'Segue anexo ' + doc.documentType.name + '\n' + doc.establishment.area.name + '\n' + doc.establishment.name})
     return render(request, 'doc/email_template.html', {'document': doc, 'form': form, 'attachments': [file], 'action': '/document/' + documentcode + '/file/' + filecode + '/email/'})
+
+def printdocumentfile(request, documentcode, filecode):
+    file = DocumentFile.objects.get(id=int(filecode))
+    return render(request, 'print_image_template.html', {'imagefile': file.documentFile.url})
