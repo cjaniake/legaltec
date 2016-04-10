@@ -6,7 +6,7 @@ from area.models import Area, Establishment
 class CustomUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     area = models.ForeignKey(Area, verbose_name="Área", null=True, blank=True)
-    establishment = models.ForeignKey(Establishment, verbose_name="Estabelecimento", null=True, blank=True)
+    establishment = models.ForeignKey(Establishment, verbose_name="Estabelecimen", null=True, blank=True)
     class Meta:
         verbose_name = "Custom information"
 

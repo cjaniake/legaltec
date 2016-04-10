@@ -1,15 +1,22 @@
 {% extends "generic_template.html" %}
 
 {% block content %}
-	<div class="row">
-		<div class="col-md-12">
-			<ul class="nav nav-pills btn-sm">
-			{% for key, value in selected.items %}
-			  <li role="presentation" class="active"><a href="/documents?{{ key }}Id=None">{{ value.name }}<span class="badge">remover</span></a></li>
-			{% endfor %}
-			</ul>
-		<div class="col-md-12">
-	</div>
+
+	{% if request.session.establishment %}
+	<h2 class="text-center text-info">
+		{{ request.session.establishment }}
+	</h2>
+	{% endif %}
+
+	{% if selected %}
+	<nav>
+		<ul class="pager">
+		{% for key, value in selected.items %}
+		  <li class="previous"><a href="/documents?{{ key }}Id=None"><span class="glyphicon glyphicon-remove text-muted"></span>  {{ value.name }}</a></li>
+		{% endfor %}
+		</ul>
+	</nav>
+	{% endif %}
 
 	<div class="row top-margin">
 		<div class="col-md-9">
@@ -32,8 +39,9 @@
 						<td>
 							<div class="btn-group btn-group-sm" role="group" aria-label="...">
 								<a class="btn btn-default" href="/document/{{ object.id }}/history" title="Hist&#243;rico"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></a>
-								<a class="btn btn-default" href="/document/{{ object.id }}/files" title="Arquivos"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span></a>
+								<a class="btn btn-default" href="/document/{{ object.id }}/files" title="Arquivos"><span class="glyphicon glyphicon-picture" aria-hidden="true"></span></a>
 								<a class="btn btn-default" href="/document/{{ object.id }}/email" title="Enviar email"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a>
+								<a class="btn btn-default" href="/document/{{ object.id }}/print" target="_blank" title="Imprimir"><span class="glyphicon glyphicon-print" aria-hidden="true"></span></a>
 								<a class="btn btn-primary" href="/document/{{ object.id }}">Alterar</a>
 							</div>
 						</td>
@@ -47,6 +55,8 @@
 			</div>
 		</div>
 		<div class="col-md-3">
+
+			{% if not request.session.establishment %}
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Estabelecimento</h3>
@@ -64,6 +74,7 @@
 					</div>
 				</div>
 			</div>
+			{% endif %}
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Tipo de Documento</h3>

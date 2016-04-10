@@ -52,6 +52,7 @@ urlpatterns = [
     url(r'^document/(?P<documentcode>[0-9]+)/history/$', docviews.ListDocumentHistoryView.as_view()),
     url(r'^document/(?P<documentcode>[0-9]+)/email/$', docviews.emaildocument),
     url(r'^document/(?P<documentcode>[0-9]+)/file/(?P<filecode>[0-9]+)/email/$', docviews.emaildocumentfile),
+    url(r'^document/(?P<documentcode>[0-9]+)/print/$', docviews.printdocumentfiles),
     url(r'^document/(?P<documentcode>[0-9]+)/file/(?P<filecode>[0-9]+)/print/$', docviews.printdocumentfile),
     url(r'^documenthistory/(?P<dochistorycode>[0-9]+)/$', docviews.view_history),
     url(r'^updateDocumentStatus/$', docviews.update_document_status),

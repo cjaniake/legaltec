@@ -56,6 +56,8 @@ class ListAreaView(TemplateView):
         if not request.user.is_authenticated():
             return HttpResponseRedirect('/accounts/login/')
         c = CustomUser.objects.filter(user__id=request.user.id)
+        if c and c[0].establishment:
+            return HttpResponseRedirect('/documents/')
         if c and c[0].area:
             return HttpResponseRedirect('/area/' + str(c[0].area.id) + '/establishments/')
         return super(ListAreaView, self).dispatch(request, *args, **kwargs)
@@ -64,10 +66,6 @@ class ListAreaView(TemplateView):
         context = super(ListAreaView, self).get_context_data(**kwargs)
         #context['object_list'] = list(Area.objects.all())
         context['object_list'] = map(lambda area: AreaWrapper(area, presentation), Area.objects.all())
-
-        new = Area()
-        new.name = "<nova>"
-        context['object_list'].append(AreaWrapper(new, presentation))
 
         # clean session information
         if 'areacode' in self.request.session:
@@ -179,6 +177,13 @@ class EstablishmentWrapper:
 # GET /area/<areacode>/establishments
 class ListEstablishmentView(TemplateView):
     template_name = "area/establishment_objlist_small.html"
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect('/accounts/login/')
+        c = CustomUser.objects.filter(user__id=request.user.id)
+        if c and c[0].establishment:
+            return HttpResponseRedirect('/documents/')
+        return super(ListEstablishmentView, self).dispatch(request, *args, **kwargs)
     def get_context_data(self, **kwargs):
         areacode = kwargs['areacode']
         context = super(ListEstablishmentView, self).get_context_data(**kwargs)

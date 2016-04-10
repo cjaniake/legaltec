@@ -13,6 +13,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from area.models import Establishment, Area
+from customauth.models import CustomUser
 from doc.models import DocumentStatus, DocumentType, DocumentTypeField, Document, DocumentHistory, DocumentFile, DocumentImageFile, TIME_UNIT_CHOICES, \
     DocumentField
 from doc.forms import DocumentStatusForm, DocumentTypeForm, DocumentTypeFieldForm, DocumentImageFileUploadForm, DocumentFileUploadForm, \
@@ -283,42 +284,58 @@ class ListDocumentView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
             return HttpResponseRedirect('/admin/login/')
-        areacode = request.session.get('areacode')
-        if not areacode:
-            return HttpResponseRedirect('/areas')
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect('/accounts/login/')
+        c = CustomUser.objects.filter(user__id=request.user.id)
+        if not c or not c[0].area:
+            areacode = request.session.get('areacode')
+            if not areacode:
+                return HttpResponseRedirect('/areas')
         return super(ListDocumentView, self).dispatch(request, *args, **kwargs)
     def documentAsList(self, document):
         return [document.establishment.name, document.documentType.name, document.documentStatus.name, document.expirationDate]
     def get_context_data(self, **kwargs):
         context = super(ListDocumentView, self).get_context_data(**kwargs)
         qset = Document.objects
+
         selectionList = self.request.session.get('selection_list') # keep serialized version
         selected = {}                                              # keep object version
         if not selectionList:
             selectionList = {}
 
-        areacode = self.request.session.get('areacode')
-        if areacode:
-            area = Area.objects.get(id=int(areacode))
+        c = CustomUser.objects.filter(user__id=self.request.user.id)
+        if c and c[0].area:
+            area = c[0].area
+        else:
+            areacode = self.request.session.get('areacode')
+            if areacode:
+                area = Area.objects.get(id=int(areacode))
 
         e = None
-        establishmentId = self.request.GET.get('establishmentId')
-        if establishmentId:
-            if establishmentId=='None':
-                if 'establishment' in selectionList:
-                    del selectionList['establishment']
-            else:
-                e = Establishment.objects.get(id=establishmentId)
-                selectionList['establishment'] = to_JSON(e)
-                qset = qset.filter(establishment=e)
-                self.request.session['areacode'] = e.area.id
-                area = e.area
+        if c and c[0].establishment:
+            e = c[0].establishment
+            self.request.session['establishment'] = e.name
         else:
-            if 'establishment' in selectionList:
-                for obj in serializers.deserialize("json", selectionList['establishment']):
-                    e = obj.object
+            establishmentId = self.request.GET.get('establishmentId')
+            if establishmentId:
+                if establishmentId=='None':
+                    if 'establishment' in selectionList:
+                        del selectionList['establishment']
+                else:
+                    e = Establishment.objects.get(id=establishmentId)
+                    selectionList['establishment'] = to_JSON(e)
+                    qset = qset.filter(establishment=e)
+                    self.request.session['areacode'] = e.area.id
+                    area = e.area
+                    selected['establishment'] = e
+            else:
+                if 'establishment' in selectionList:
+                    for obj in serializers.deserialize("json", selectionList['establishment']):
+                        e = obj.object
+                        selected['establishment'] = e
+
         if e:
-            selected['establishment'] = e
             qset = qset.filter(establishment=e)
         else:
             inner_qs = Establishment.objects.filter(area__id__exact=area.id)
@@ -652,4 +669,10 @@ def emaildocumentfile(request, documentcode, filecode):
 
 def printdocumentfile(request, documentcode, filecode):
     file = DocumentFile.objects.get(id=int(filecode))
-    return render(request, 'print_image_template.html', {'imagefile': file.documentFile.url})
+    return render(request, 'print_image_template.html', {'imagefiles': [file.documentFile.url]})
+
+def printdocumentfiles(request, documentcode):
+    doc = Document.objects.get(id=int(documentcode))
+    ducument_file_list = DocumentFile.objects.filter(document__id=doc.id).all()
+    image_files = map(lambda f: f.documentFile.url, ducument_file_list)
+    return render(request, 'print_image_template.html', {'imagefiles': image_files})

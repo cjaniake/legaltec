@@ -34,11 +34,15 @@
 					</li>
 					{% endif %}
 
+					{% if not request.session.establishment %}
 					<li {% if not request.session.areacode %} class="disabled" {% endif %}><a href="/area/{{ request.session.areacode }}/establishments">Estabelecimentos</a></li>
+					{% endif %}
 
-					<li {% if not request.session.areacode %} class="disabled" {% endif %}>
+					<li {% if not request.session.establishment and not request.session.areacode %} class="disabled" {% endif %}>
 						<a href="/documents">Documentos</a>
 					</li>
+
+					{% if request.user.is_superuser %}
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Configurar<strong class="caret"></strong></a>
 						<ul class="dropdown-menu">
@@ -53,6 +57,7 @@
 							</li>
 						</ul>
 					</li>
+					{% endif %}
 				</ul>
 				<ul class="nav navbar-nav nav-pills navbar-right">
 					<li>
@@ -67,13 +72,15 @@
 						{% else %}
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ request.user.username }}<strong class="caret"></strong></a>
 						<ul class="dropdown-menu">
+							{% if request.user.is_superuser %}
 							<li>
 								<a href="/admin/auth/user/{{ request.user.id }}/">Usuário</a>
 							</li>
 							<li>
 								<a href="/admin/">Segurança</a>
 							</li>
-							<li class="divider">
+							<li class="divider" />
+							{% endif %}
 							<li>
 								<a href="/logout/">Sair</a>
 							</li>

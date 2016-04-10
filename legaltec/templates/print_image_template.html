@@ -5,7 +5,9 @@
     <title>Legaltec</title>
 </head>
 <body>
-    <img src="{{ imagefile }}" />
+    {% for imagefile in imagefiles %}
+    <img src="{{ imagefile }}" style="page-break-after: always"/>
+    {% endfor %}
     <script src="/static/js/jquery.min.js"></script>
     <script>
 	  jQuery(document).ready(function($) {
