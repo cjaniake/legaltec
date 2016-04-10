@@ -644,7 +644,7 @@ def emaildocument(request, documentcode):
             return HttpResponseRedirect('/documents/')
 
     else:
-        form = EmailForm(initial={'subject': doc.documentType.name, 'body': 'Segue anexo ' + doc.documentType.name + '\n' + doc.establishment.area.name + '\n' + doc.establishment.name})
+        form = EmailForm(initial={'subject': doc.documentType.name, 'body': 'Segue anexo ' + doc.documentType.name + '\n' + doc.establishment.area.name + ' ' + doc.establishment.name + '\n' + 'CPNJ: ' + doc.establishment.cnpj })
     return render(request, 'doc/email_template.html', {'document': doc, 'form': form, 'attachments': file_list, 'action': '/document/' + documentcode + '/email/'})
 
 def emaildocumentfile(request, documentcode, filecode):
