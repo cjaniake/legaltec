@@ -40,7 +40,7 @@
 					</tr>
 					{% endfor %}
 				</table>
-
+			{% if request.user.is_superuser %}
 			</div>
 			<form action="/document/{{ document.id }}/file/" method="POST" enctype="multipart/form-data">
 					{% csrf_token %}
@@ -49,6 +49,7 @@
 					{% endfor %}
 					<button type="submit" class="btn btn-primary btn-sm">Enviar Documento</button>
 			</form>
+			{% endif %}
 		</div>
 	</div>
 
