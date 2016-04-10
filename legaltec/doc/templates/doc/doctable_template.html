@@ -42,7 +42,9 @@
 								<a class="btn btn-default" href="/document/{{ object.id }}/files" title="Arquivos"><span class="glyphicon glyphicon-picture" aria-hidden="true"></span></a>
 								<a class="btn btn-default" href="/document/{{ object.id }}/email" title="Enviar email"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a>
 								<a class="btn btn-default" href="/document/{{ object.id }}/print" target="_blank" title="Imprimir"><span class="glyphicon glyphicon-print" aria-hidden="true"></span></a>
+								{% if request.user.is_superuser %}
 								<a class="btn btn-primary" href="/document/{{ object.id }}">Alterar</a>
+								{% endif %}
 							</div>
 						</td>
 					</tr>
@@ -50,9 +52,11 @@
 				</table>
 
 			</div>
+			{% if request.user.is_superuser %}
 			<div class="btn-group btn-group-sm" role="group" aria-label="...">
 				<a href="/document" class="btn btn-primary">Incluir Novo Documento</a>
 			</div>
+			{% endif %}
 		</div>
 		<div class="col-md-3">
 
