@@ -10,4 +10,4 @@ class AreaForm(ModelForm):
 class EstablishmentForm(ModelForm):
     class Meta:
         model = Establishment
-        fields = ['name','city','state','adminEmail']
+        fields = ['name','city','state','adminEmail','cnpj','iest']

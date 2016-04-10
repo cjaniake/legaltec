@@ -16,6 +16,8 @@ class Establishment(models.Model):
     city = models.CharField("Cidade", max_length=100)
     state = models.CharField("Estado", max_length=2)
     adminEmail = models.EmailField("Email administrador")
+    cnpj = models.CharField("CNPJ", max_length=20, null=True, blank=True)
+    iest = models.CharField("Inscrição Estadual", max_length=20, null=True, blank=True)
     class Meta:
         unique_together = ("area", "name")
     def __unicode__(self):

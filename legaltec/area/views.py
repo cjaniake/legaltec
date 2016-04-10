@@ -221,6 +221,8 @@ def handle_establishment(request, areacode=None):
             l.city = form.cleaned_data['city']
             l.state = form.cleaned_data['state']
             l.adminEmail = form.cleaned_data['adminEmail']
+            l.cpnj = form.cleaned_data['cnpj']
+            l.iest = form.cleaned_data['iest']
             l.area = area
 
             l.save()
@@ -248,6 +250,8 @@ def edit_establishment(request, areacode=None, establishmentid=None):
                 l.city = form.cleaned_data['city']
                 l.state = form.cleaned_data['state']
                 l.adminEmail = form.cleaned_data['adminEmail']
+                l.cpnj = form.cleaned_data['cnpj']
+                l.iest = form.cleaned_data['iest']
                 l.save()
 
                 return HttpResponseRedirect('/area/' + areacode + '/establishments')
