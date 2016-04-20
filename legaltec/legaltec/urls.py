@@ -63,5 +63,5 @@ urlpatterns = [
     url(r'^events/$', userviews.ListEventsView.as_view()),
     url(r'^event/(?P<eventid>[0-9]+)/$', userviews.view_event),
     url(r'^logout/$', userviews.logout),
-    url(r'^(?P<url>.*)/$', areaviews.ListAreaView.as_view())
+    url(r'^$', areaviews.ListAreaView.as_view())
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
