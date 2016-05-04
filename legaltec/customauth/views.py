@@ -74,21 +74,14 @@ class ListAdminMessagesView(TemplateView):
             admin_chat_user = {}
             admin_chat_user['user'] = user
             admin_chat_user['unread'] = Message.objects.filter(establishment_id = None).filter(user_id = user.id).filter(origin=1).filter(readDate = None).count()
-            admin_chat_user['msg_list'] = Message.objects.filter(establishment_id = None).filter(user_id = user.id).order_by('-eventDate')[:20]
+            admin_chat_user['msg_list'] = Message.objects.filter(establishment_id = None).filter(user_id = user.id).order_by('-eventDate')[:6]
             admin_chat_user['form'] = ChatAdminMessageForm(initial = {"user": user})
 
             admin_chat_context.append(admin_chat_user)
 
-
-#        qset.update(readDate=timezone.now())
-
-        cache.delete(cacheKeyUser(None))
-
-
-
         userParam = self.request.GET['user'] if 'user' in self.request.GET and self.request.GET['user'] != '' else None
 
-
+        context['admin_chat'] = admin_chat_context
         context['action'] = '/chat/admin/post/'
         return context
 
@@ -114,7 +107,7 @@ def handle_user_message(request):
     return HttpResponseRedirect(redirectTo)
 
 def handle_admin_message(request):
-    redirectTo = '/chat/admin/?'
+    redirectTo = '/chat/admin/'
     if request.method == 'POST':
 
         form = ChatAdminMessageForm(request.POST)
@@ -122,21 +115,19 @@ def handle_admin_message(request):
         if form.is_valid():
             m = Message()
             user = form.cleaned_data['user']
-            if user:
-                m.user = user
-                redirectTo = redirectTo + '&user=' + str(user.id)
+            m.user = user
             m.text = form.cleaned_data['text']
             m.origin = 2
-            establishment = form.cleaned_data['establishment']
-            if establishment:
-                m.establishment = establishment
-                redirectTo = redirectTo + '&estab=' + str(establishment.id)
-
             m.save()
             cache.delete(cacheKeyUser(user))
 
 
     return HttpResponseRedirect(redirectTo)
+
+def mark_as_read_admin_message(self, userid=None):
+    qset = Message.objects.filter(establishment_id = None).filter(user_id = userid).filter(origin=1).filter(readDate = None)
+    updateResult = qset.update(readDate=timezone.now())
+    cache.delete(cacheKeyUser(None))
 
 class ListEventsView(TemplateView):
     template_name = "customauth/event_list.html"

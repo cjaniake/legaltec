@@ -2,21 +2,25 @@
 
 {% block content %}
     <div class="panel-group" id="accordion">
-    {% for chat in admin_chat_context %}
+    {% for chat in admin_chat %}
 
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">{{ chat.user.name }}</a>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ chat.user.id }}">
+                        {{ chat.user.username }}
+                        <span class="badge" id="msgcount{{ chat.user.id }}">{{ chat.unread }}</span>
+                    </a>
                 </h4>
             </div>
-            <div id="collapse1" class="panel-collapse collapse in">
+            <div id="collapse{{ chat.user.id }}" class="panel-collapse collapse">
                 <div class="panel-body">
 
                     <form action="{{ action }}" method="post">
                         {% csrf_token %}
                         <div class="row">
                             <div class="col-md-9">
+                                {{ chat.form.user }}
                                 {{ chat.form.text }}
                             </div>
                             <div class="col-md-3">
@@ -31,14 +35,12 @@
 
                     {% for msg in chat.msg_list %}
                     <div class="row">
-                        {% if msg.origin == 1 %}
+                        {% if msg.origin == 2 %}
                         <div class="col-md-9">
                             <div class="well well-lg">
                                 {{ msg.text|linebreaksbr }}
                                 <div class="text-right">
                                     <small>
-                                        {% if msg.user %}{{ msg.user.username }}{% endif %}
-                                        {% if msg.establishment %}{{ msg.establishment.name }}{% endif %}
                                         {{ msg.eventDate }}
                                     </small>
                                 </div>
@@ -52,8 +54,6 @@
                                 {{ msg.text|linebreaksbr }}
                                 <div class="text-right">
                                     <small>
-                                        {% if msg.user %}p/ {{ msg.user.username }}{% endif %}
-                                        {% if msg.establishment %}{{ msg.establishment.name }}{% endif %}
                                         {{ msg.eventDate }}
                                     </small>
                                 </div>
@@ -69,8 +69,15 @@
     {% endfor %}
     </div>
 
-
-
+    <script>
+        $('#accordion').on('show.bs.collapse', function (e) {
+            userid = e.target.id.substring(8)
+            markAsReadUrl = window.location.href.substring(0,window.location.href.indexOf('/chat/admin/')) + '/chat/admin/markasread/' + userid
+            $.ajax(markAsReadUrl)
+            $('#msgcount' + userid).html('0')
+        })
+    </script>
+<!--
 
 
     <form action="{{ action }}" method="post">
@@ -105,4 +112,5 @@
         });
 
     </script>
+-->
 {% endblock %}
