@@ -35,7 +35,7 @@ class Message(models.Model):
     establishment = models.ForeignKey(Establishment, verbose_name="Estabelecimento", null=True, blank=True)
     origin = models.IntegerField("Origem", choices=MESSAGE_ORIGINS, default=3)
     def __unicode__(self):
-        return u'%s %s %s' % (self.eventDate, self.text)
+        return u'{:%Y-%m-%d %H:%M:%S} {}'.format(self.eventDate, self.text)
 
 import customauth.receiver
 

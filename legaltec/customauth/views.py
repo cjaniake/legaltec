@@ -7,10 +7,9 @@ from customauth.forms import ChatUserMessageForm, ChatAdminMessageForm, EventFor
 from customauth.models import Message
 from django.core.cache import cache
 from django.contrib.auth import logout as djangologout
-import threading
-
+from django.contrib.auth.models import User
 from customauth.models import SystemEvent
-
+from django.db.models import Count, Max
 
 def countUserMsg(user):
     qset = Message.objects.filter(establishment_id = None).filter(readDate = None)
@@ -68,20 +67,21 @@ class ListAdminMessagesView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ListAdminMessagesView, self).get_context_data(**kwargs)
 
-        estabParam = self.request.GET['estab'] if 'estab' in self.request.GET and self.request.GET['estab'] != '' else None
+        ordered_users = User.objects.annotate(maxdt=Max('message__eventDate')).order_by('-maxdt')
+        admin_chat_context = []
+
+        for user in ordered_users:
+            admin_chat_user = {}
+            admin_chat_user['user'] = user
+            admin_chat_user['unread'] = Message.objects.filter(establishment_id = None).filter(user_id = user.id).filter(origin=1).filter(readDate = None).count()
+            admin_chat_user['msg_list'] = Message.objects.filter(establishment_id = None).filter(user_id = user.id).order_by('-eventDate')[:6]
+            admin_chat_user['form'] = ChatAdminMessageForm(initial = {"user": user})
+
+            admin_chat_context.append(admin_chat_user)
+
         userParam = self.request.GET['user'] if 'user' in self.request.GET and self.request.GET['user'] != '' else None
 
-        context['form'] = ChatAdminMessageForm(initial = {"user": userParam, "establishment": estabParam})
-        qset = Message.objects
-        qset = qset.filter(establishment_id = int(estabParam) if estabParam else None)
-        if userParam:
-            qset = qset.filter(user_id = userParam)
-        context['msg_list'] = qset.order_by('-eventDate')[:20]
-
-        qset = qset.filter(origin=1)
-        qset.update(readDate=timezone.now())
-        cache.delete(cacheKeyUser(None))
-
+        context['admin_chat'] = admin_chat_context
         context['action'] = '/chat/admin/post/'
         return context
 
@@ -107,7 +107,7 @@ def handle_user_message(request):
     return HttpResponseRedirect(redirectTo)
 
 def handle_admin_message(request):
-    redirectTo = '/chat/admin/?'
+    redirectTo = '/chat/admin/'
     if request.method == 'POST':
 
         form = ChatAdminMessageForm(request.POST)
@@ -115,21 +115,19 @@ def handle_admin_message(request):
         if form.is_valid():
             m = Message()
             user = form.cleaned_data['user']
-            if user:
-                m.user = user
-                redirectTo = redirectTo + '&user=' + str(user.id)
+            m.user = user
             m.text = form.cleaned_data['text']
             m.origin = 2
-            establishment = form.cleaned_data['establishment']
-            if establishment:
-                m.establishment = establishment
-                redirectTo = redirectTo + '&estab=' + str(establishment.id)
-
             m.save()
             cache.delete(cacheKeyUser(user))
 
 
     return HttpResponseRedirect(redirectTo)
+
+def mark_as_read_admin_message(self, userid=None):
+    qset = Message.objects.filter(establishment_id = None).filter(user_id = userid).filter(origin=1).filter(readDate = None)
+    updateResult = qset.update(readDate=timezone.now())
+    cache.delete(cacheKeyUser(None))
 
 class ListEventsView(TemplateView):
     template_name = "customauth/event_list.html"

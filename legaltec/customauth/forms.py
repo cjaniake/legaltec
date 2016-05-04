@@ -15,8 +15,9 @@ class ChatUserMessageForm(ModelForm):
 class ChatAdminMessageForm(ModelForm):
     class Meta:
         model = Message
-        fields = ['user','establishment','text']
+        fields = ['user','text']
         widgets = {
+            'user': forms.HiddenInput(),
             'text': forms.Textarea(attrs={'rows':4})
         }
 
